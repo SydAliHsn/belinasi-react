@@ -1,24 +1,65 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import Home from './pages/Home';
+import Religious from './pages/Religious';
+import Catalog from './pages/Catalog';
+import ProductDetails from './pages/ProductDetails';
+import Fundraising from './pages/Fundraising';
+import Political from './pages/Political';
+import Schools from './pages/Schools';
+import PeerToPeer from './pages/PeerToPeer';
+import AnimalShelter from './pages/AnimalShelter';
+import Adoption from './pages/Adoption';
+import NotFound from './pages/NotFound';
+import NonProfits from './pages/NonProfits';
+import MissionTrips from './pages/mission-trips';
+import Contact from './pages/Contact';
+import Cause from './pages/Cause';
+import Designer from './pages/Designer';
+import SignupLogin from './pages/SignupLogin';
+import Dashboard from './pages/Dashboard';
+import Shop from './pages/Shop';
+import MyAccount from './pages/MyAccount';
+import Checkout1 from './pages/Checkout1';
+import Cart from './pages/Cart';
 
 function App() {
+  const [user, setUser] = useState(null);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route index path="/" element={<Home />} />
+        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/cause" element={<Cause />} />
+        <Route path="/signup-login" element={<SignupLogin />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/myAccount" element={<MyAccount />} />
+        <Route path="/cart" element={<Cart />} />
+
+        <Route path="/products/:productId" element={<ProductDetails />} />
+        <Route path="/designer" element={<Designer />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/checkout" element={<Checkout1 />} />
+
+        {/* Fundraising */}
+        <Route path="/fundraising" element={<Fundraising />} />
+        <Route path="/fundraising/religious" element={<Religious />} />
+        <Route path="/fundraising/political" element={<Political />} />
+        <Route path="/fundraising/schools" element={<Schools />} />
+        <Route path="/fundraising/peer-to-peer" element={<PeerToPeer />} />
+        <Route path="/fundraising/animal-shelter" element={<AnimalShelter />} />
+        <Route path="/fundraising/adoption" element={<Adoption />} />
+        <Route path="/fundraising/nonprofits" element={<NonProfits />} />
+        <Route path="/fundraising/mission-trips" element={<MissionTrips />} />
+        {/* Fundraising */}
+
+        {/* Page not found should be at last */}
+        <Route path="/*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
