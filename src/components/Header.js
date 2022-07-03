@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+import { getCart, removeProduct } from '../utils/cart';
+
 const Header = () => {
   const [minicartActive, setMinicartActive] = useState(false);
   const [mobileHeaderActive, setMobileHeaderActive] = useState(false);
   const [headerSticky, setHeaderSticky] = useState(false);
+  const [cartProducts, setCartProducts] = useState(getCart());
 
   setInterval(() => {
     window.scrollY > 200 ? setHeaderSticky(true) : setHeaderSticky(false);
@@ -25,60 +28,49 @@ const Header = () => {
   };
 
   const renderMinicartProducts = () => {
-    return (
-      <div class="minicart__product">
-        <div class="minicart__product--items d-flex">
+    const removeCartProduct = e => {
+      const productId = e.target
+        .closest('.minicart__product--items')
+        .getAttribute('productId');
+
+      removeProduct(productId);
+
+      setCartProducts(getCart());
+    };
+
+    const products = cartProducts.map(product => {
+      return (
+        <div class="minicart__product--items d-flex" productId={product.id}>
           <div class="minicart__thumb">
-            <a href="product-details.html">
-              <img
-                src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=725&q=80"
-                alt="product-img"
-              />
-            </a>
+            <Link to={`/products/${product.id}`}>
+              <img src={product.imgs[0]} alt="product-img" />
+            </Link>
           </div>
           <div class="minicart__text">
             <h3 class="minicart__subtitle h4">
-              <a href="product-details.html">Oversize Cotton Dress</a>
+              <Link to={`/products/${product.id}`}>{product.title}</Link>
             </h3>
             <span class="color__variant">
-              <b>Color:</b> Beige
+              <b>Color:</b> {product.selectedColor}
             </span>
             <div class="minicart__price">
-              <span class="current__price">$125.00</span>
+              <span class="current__price">${product.price}</span>
             </div>
             <div class="minicart__text--footer d-flex align-items-center">
               <div class="quantity__box minicart__quantity">1</div>
-              <button class="minicart__product--remove">Remove</button>
+              <button
+                class="minicart__product--remove"
+                onClick={removeCartProduct}
+              >
+                Remove
+              </button>
             </div>
           </div>
         </div>
-        <div class="minicart__product--items d-flex">
-          <div class="minicart__thumb">
-            <a href="product-details.html">
-              <img
-                src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=725&q=80"
-                alt="product-img"
-              />
-            </a>
-          </div>
-          <div class="minicart__text">
-            <h3 class="minicart__subtitle h4">
-              <a href="product-details.html">Boxy Denim Jacket</a>
-            </h3>
-            <span class="color__variant">
-              <b>Color:</b> Green
-            </span>
-            <div class="minicart__price">
-              <span class="current__price">$115.00</span>
-            </div>
-            <div class="minicart__text--footer d-flex align-items-center">
-              <div class="quantity__box minicart__quantity">2</div>
-              <button class="minicart__product--remove">Remove</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+      );
+    });
+
+    return <div class="minicart__product">{products}</div>;
   };
 
   const renderMobileHeader = () => {
@@ -86,10 +78,10 @@ const Header = () => {
       <div class={'offcanvas__header ' + (mobileHeaderActive ? 'open' : '')}>
         <div class="offcanvas__inner">
           <div class="offcanvas__logo">
-            <a class="offcanvas__logo_link" href={'/'}>
+            <Link class="offcanvas__logo_link" to={'/'}>
               <img />
               <h2>BELINASI</h2>
-            </a>
+            </Link>
             <button
               class="offcanvas__close--btn"
               data-offcanvas
@@ -101,98 +93,98 @@ const Header = () => {
           <nav class="offcanvas__menu">
             <ul class="offcanvas__menu_ul">
               <li class="offcanvas__menu_li">
-                <a class="offcanvas__menu_item" href="index.html">
+                <Link class="offcanvas__menu_item" to="/">
                   Partnership
-                </a>
+                </Link>
                 <button
                   className="offcanvas__sub_menu_toggle"
                   onClick={toggleSubmenu}
                 ></button>
                 <ul class="offcanvas__sub_menu">
                   <li class="offcanvas__sub_menu_li">
-                    <a href="index.html" class="offcanvas__sub_menu_item">
+                    <Link to="/" class="offcanvas__sub_menu_item">
                       Become a Seller
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="index-2.html" class="offcanvas__sub_menu_item">
+                    <Link to="/" class="offcanvas__sub_menu_item">
                       Create a Store
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </li>
               <li class="offcanvas__menu_li">
-                <a class="offcanvas__menu_item" href="index.html">
+                <Link class="offcanvas__menu_item" to="/">
                   Shop
-                </a>
+                </Link>
                 <button
                   className="offcanvas__sub_menu_toggle"
                   onClick={toggleSubmenu}
                 ></button>
                 <ul class="offcanvas__sub_menu">
                   <li class="offcanvas__sub_menu_li">
-                    <a href="index.html" class="offcanvas__sub_menu_item">
+                    <Link to="/" class="offcanvas__sub_menu_item">
                       Become a Seller
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="index-2.html" class="offcanvas__sub_menu_item">
+                    <Link to="/" class="offcanvas__sub_menu_item">
                       Create a Store
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </li>
               <li class="offcanvas__menu_li">
-                <a class="offcanvas__menu_item" href="#">
+                <Link class="offcanvas__menu_item" to="/shop">
                   Marketplace
-                </a>
+                </Link>
                 <button
                   className="offcanvas__sub_menu_toggle"
                   onClick={toggleSubmenu}
                 ></button>
                 <ul class="offcanvas__sub_menu">
                   <li class="offcanvas__sub_menu_li">
-                    <a href="shop.html" class="offcanvas__sub_menu_item">
+                    <Link to="/shop" class="offcanvas__sub_menu_item">
                       Campaign Products
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="shop.html" class="offcanvas__sub_menu_item">
+                    <Link to="/shop" class="offcanvas__sub_menu_item">
                       Belinasi Products
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="shop.html" class="offcanvas__sub_menu_item">
+                    <Link to="/shop" class="offcanvas__sub_menu_item">
                       Public Figure Products
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="shop.html" class="offcanvas__sub_menu_item">
+                    <Link to="/shop" class="offcanvas__sub_menu_item">
                       Yayasan Products
-                    </a>
+                    </Link>
                   </li>
                   <li class="offcanvas__sub_menu_li">
-                    <a href="shop.html" class="offcanvas__sub_menu_item">
+                    <Link to="/shop" class="offcanvas__sub_menu_item">
                       Vouchers & Giveaways
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </li>
               <li class="offcanvas__menu_li">
-                <a class="offcanvas__menu_item" href="about.html">
+                <Link class="offcanvas__menu_item" to="/about">
                   About
-                </a>
+                </Link>
               </li>
               <li class="offcanvas__menu_li">
-                <a class="offcanvas__menu_item" href="contact.html">
+                <Link class="offcanvas__menu_item" to="/contact">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
             <div class="offcanvas__account--items">
-              <a
+              <Link
                 class="offcanvas__account--items__btn d-flex align-items-center"
-                href="login.html"
+                to="/signup-login"
               >
                 <span class="offcanvas__account--items__icon">
                   <svg
@@ -221,7 +213,7 @@ const Header = () => {
                 <span class="offcanvas__account--items__label">
                   Login / Register
                 </span>
-              </a>
+              </Link>
             </div>
           </nav>
         </div>
@@ -281,12 +273,12 @@ const Header = () => {
         </div>
 
         <div class="minicart__button-container d-flex justify-content-center">
-          <a class="primary__btn minicart__button--link" href="cart.html">
+          <Link class="primary__btn minicart__button--link" to="/cart">
             View cart
-          </a>
-          <a class="primary__btn minicart__button--link" href="checkout.html">
+          </Link>
+          <Link class="primary__btn minicart__button--link" to="/checkout">
             Checkout
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -303,11 +295,7 @@ const Header = () => {
               class="offcanvas__header--menu__open"
               onClick={() => setMobileHeaderActive(true)}
             >
-              <a
-                class="offcanvas__header--menu__open--btn"
-                href="javascript:void(0)"
-                data-offcanvas
-              >
+              <a class="offcanvas__header--menu__open--btn" data-offcanvas>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="ionicon offcanvas__header--menu__open--svg"
@@ -327,10 +315,10 @@ const Header = () => {
             </div>
             <div class="main__logo">
               <h1 class="main__logo--title">
-                <a class="main__logo--link" href={'/'}>
+                <Link class="main__logo--link" to={'/'}>
                   <img class="main__logo--img" src="" />
                   BELINASI
-                </a>
+                </Link>
               </h1>
             </div>
             <div class="header__search--widget header__sticky--none d-none d-lg-block">
@@ -378,7 +366,7 @@ const Header = () => {
             <div class="header__account header__sticky--none">
               <ul class="d-flex">
                 <li class="header__account--items">
-                  <a class="header__account--btn" href="my-account.html">
+                  <Link class="header__account--btn" to="/myAccount">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="26.51"
@@ -402,10 +390,10 @@ const Header = () => {
                       />
                     </svg>
                     <span class="header__account--btn__text">My Account</span>
-                  </a>
+                  </Link>
                 </li>
                 <li class="header__account--items d-none d-lg-block">
-                  <a class="header__account--btn" href="wishlist.html">
+                  <Link class="header__account--btn" to="myAccount#wishlist">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="28.51"
@@ -423,12 +411,11 @@ const Header = () => {
                     </svg>
                     <span class="header__account--btn__text"> Wish List</span>
                     <span class="items__count wishlist">02</span>
-                  </a>
+                  </Link>
                 </li>
                 <li class="header__account--items">
                   <a
                     class="header__account--btn minicart__open--btn"
-                    href="javascript:void(0)"
                     data-offcanvas
                     onClick={() => setMinicartActive(true)}
                   >
@@ -471,7 +458,7 @@ const Header = () => {
               <nav class="header__menu--navigation">
                 <ul class="d-flex">
                   <li class="header__menu--items style2">
-                    <a class="header__menu--link" href="index.html">
+                    <Link class="header__menu--link" to="/">
                       Partnership
                       <svg
                         class="menu__arrowdown--icon"
@@ -487,32 +474,32 @@ const Header = () => {
                           opacity="0.7"
                         />
                       </svg>
-                    </a>
+                    </Link>
                     <ul class="header__sub--menu">
                       <li class="header__sub--menu__items">
-                        <a href="index.html" class="header__sub--menu__link">
+                        <Link to="/" class="header__sub--menu__link">
                           Become a Seller
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="index-2.html" class="header__sub--menu__link">
+                        <Link to="/.html" class="header__sub--menu__link">
                           Create a Store
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
                   <li class="header__menu--items style2">
-                    <a class="header__menu--link" href="about.html">
+                    <Link class="header__menu--link" to="/about">
                       About Us
-                    </a>
+                    </Link>
                   </li>
                   <li class="header__menu--items style2 d-none d-xl-block">
-                    <a class="header__menu--link" href="shop.html">
+                    <Link class="header__menu--link" to="/shop">
                       Categories
-                    </a>
+                    </Link>
                   </li>
                   <li class="header__menu--items style2">
-                    <a class="header__menu--link" href="#">
+                    <Link class="header__menu--link" to="/shop">
                       Marketplace
                       <svg
                         class="menu__arrowdown--icon"
@@ -528,39 +515,39 @@ const Header = () => {
                           opacity="0.7"
                         />
                       </svg>
-                    </a>
+                    </Link>
                     <ul class="header__sub--menu">
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Campaign Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Yayasan Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Public Figure Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Belinasi Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Vouchers & Giveaways
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
                   <li class="header__menu--items style2">
-                    <a class="header__menu--link" href="contact.html">
+                    <Link class="header__menu--link" to="/contact">
                       Contact
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </nav>
@@ -570,7 +557,6 @@ const Header = () => {
                 <li class="header__account--items header__account2--items header__account--search__items d-none d-lg-block">
                   <a
                     class="header__account--btn search__open--btn"
-                    href="javascript:void(3)"
                     data-offcanvas
                   >
                     <svg
@@ -600,7 +586,7 @@ const Header = () => {
                   </a>
                 </li>
                 <li class="header__account--items header__account2--items">
-                  <a class="header__account--btn" href="my-account.html">
+                  <Link class="header__account--btn" to="/myAccount">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="26.51"
@@ -624,10 +610,10 @@ const Header = () => {
                       />
                     </svg>
                     <span class="visually-hidden">My Account</span>
-                  </a>
+                  </Link>
                 </li>
                 <li class="header__account--items header__account2--items d-none d-lg-block">
-                  <a class="header__account--btn" href="wishlist.html">
+                  <Link class="header__account--btn" to="/myAccount#wishlist">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="28.51"
@@ -644,12 +630,11 @@ const Header = () => {
                       ></path>
                     </svg>
                     <span class="items__count wishlist style2">02</span>
-                  </a>
+                  </Link>
                 </li>
                 <li class="header__account--items header__account2--items">
                   <a
                     class="header__account--btn minicart__open--btn"
-                    href="javascript:void(0)"
                     data-offcanvas
                     onClick={() => setMinicartActive(true)}
                   >
@@ -697,7 +682,7 @@ const Header = () => {
               <nav class="header__menu--navigation">
                 <ul class="d-flex">
                   <li class="header__menu--items">
-                    <a class="header__menu--link" href="index.html">
+                    <Link class="header__menu--link" to="/">
                       Partnership
                       <svg
                         class="menu__arrowdown--icon"
@@ -713,32 +698,32 @@ const Header = () => {
                           opacity="0.7"
                         />
                       </svg>
-                    </a>
+                    </Link>
                     <ul class="header__sub--menu">
                       <li class="header__sub--menu__items">
-                        <a href="index.html" class="header__sub--menu__link">
+                        <Link to="/" class="header__sub--menu__link">
                           Become a Seller
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="index-2.html" class="header__sub--menu__link">
+                        <Link to="/" class="header__sub--menu__link">
                           Create a Store
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
                   <li class="header__menu--items">
-                    <a class="header__menu--link" href="about.html">
+                    <Link class="header__menu--link" to="/about">
                       About Us
-                    </a>
+                    </Link>
                   </li>
                   <li class="header__menu--items d-none d-xl-block">
-                    <a class="header__menu--link" href="shop.html">
+                    <Link class="header__menu--link" to="/shop">
                       Categories
-                    </a>
+                    </Link>
                   </li>
                   <li class="header__menu--items">
-                    <a class="header__menu--link" href="#">
+                    <Link class="header__menu--link" to="/shop">
                       Marketplace
                       <svg
                         class="menu__arrowdown--icon"
@@ -754,39 +739,39 @@ const Header = () => {
                           opacity="0.7"
                         />
                       </svg>
-                    </a>
+                    </Link>
                     <ul class="header__sub--menu">
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Campaign Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Yayasan Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Public Figure Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="shop.html" class="header__sub--menu__link">
+                        <Link to="/shop" class="header__sub--menu__link">
                           Belinasi Products
-                        </a>
+                        </Link>
                       </li>
                       <li class="header__sub--menu__items">
-                        <a href="wishlist.html" class="header__sub--menu__link">
+                        <Link to="/wishlist" class="header__sub--menu__link">
                           Vouchers & Giveaways
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
                   <li class="header__menu--items">
-                    <a class="header__menu--link" href="contact.html">
+                    <Link class="header__menu--link" to="/contact">
                       Contact
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </nav>
@@ -803,7 +788,7 @@ const Header = () => {
       <div class="offcanvas__stikcy--toolbar active">
         <ul class="d-flex justify-content-between">
           <li class="offcanvas__stikcy--toolbar__list">
-            <a class="offcanvas__stikcy--toolbar__btn" href="index.html">
+            <Link class="offcanvas__stikcy--toolbar__btn" to="/">
               <span class="offcanvas__stikcy--toolbar__icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -819,10 +804,10 @@ const Header = () => {
                 </svg>
               </span>
               <span class="offcanvas__stikcy--toolbar__label">Home</span>
-            </a>
+            </Link>
           </li>
           <li class="offcanvas__stikcy--toolbar__list">
-            <a class="offcanvas__stikcy--toolbar__btn" href="shop.html">
+            <Link class="offcanvas__stikcy--toolbar__btn" to="/shop">
               <span class="offcanvas__stikcy--toolbar__icon">
                 <svg
                   fill="currentColor"
@@ -835,12 +820,11 @@ const Header = () => {
                 </svg>
               </span>
               <span class="offcanvas__stikcy--toolbar__label">Shop</span>
-            </a>
+            </Link>
           </li>
           <li class="offcanvas__stikcy--toolbar__list">
             <a
               class="offcanvas__stikcy--toolbar__btn search__open--btn"
-              href="javascript:void(0)"
               data-offcanvas
             >
               <span class="offcanvas__stikcy--toolbar__icon">
@@ -873,7 +857,6 @@ const Header = () => {
           <li class="offcanvas__stikcy--toolbar__list">
             <a
               class="offcanvas__stikcy--toolbar__btn minicart__open--btn"
-              href="javascript:void(0)"
               data-offcanvas
               onClick={() => setMinicartActive(true)}
             >

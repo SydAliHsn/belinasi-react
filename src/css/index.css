@@ -3066,7 +3066,11 @@ body.overlay__active::before {
 .minicart__title {
   font-weight: 600;
 }
+.minicart__open--btn {
+  cursor: pointer;
+}
 .minicart__close--btn {
+  cursor: pointer;
   padding: 0;
   background: inherit;
   border: 0;
