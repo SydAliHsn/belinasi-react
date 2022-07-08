@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const toggleFooterWidget = e => {
@@ -167,34 +168,37 @@ const Footer = () => {
               </h2>
               <ul class="footer__widget--menu footer__widget--inner">
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="my-account.html">
+                  <Link class="footer__widget--menu__text" to="/myAccount">
                     My Account
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="cart.html">
+                  <Link class="footer__widget--menu__text" to="/cart">
                     Shopping Cart
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="login.html">
+                  <Link class="footer__widget--menu__text" to="/signup-login">
                     Login
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="login.html">
+                  <Link class="footer__widget--menu__text" to="/signup-login">
                     Register
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="checkout.html">
+                  <Link class="footer__widget--menu__text" to="/checkout">
                     Checkout
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="wishlist.html">
+                  <Link
+                    class="footer__widget--menu__text"
+                    to="/myAccount#wishlist"
+                  >
                     Wishlist
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -223,19 +227,19 @@ const Footer = () => {
               </h2>
               <ul class="footer__widget--menu footer__widget--inner">
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="about.html">
+                  <Link class="footer__widget--menu__text" to="/about">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="contact.html">
+                  <Link class="footer__widget--menu__text" to="/contact">
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="portfolio.html">
+                  <Link class="footer__widget--menu__text" to="/portfolio">
                     Portfolio
-                  </a>
+                  </Link>
                 </li>
                 <li class="footer__widget--menu__list">
                   <a
@@ -243,16 +247,6 @@ const Footer = () => {
                     href="privacy-policy.html"
                   >
                     Privacy Policy
-                  </a>
-                </li>
-                <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="compare.html">
-                    Compare
-                  </a>
-                </li>
-                <li class="footer__widget--menu__list">
-                  <a class="footer__widget--menu__text" href="faq.html">
-                    Frequently
                   </a>
                 </li>
               </ul>

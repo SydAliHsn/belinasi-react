@@ -20,9 +20,11 @@ import Designer from './pages/Designer';
 import SignupLogin from './pages/SignupLogin';
 import Dashboard from './pages/Dashboard';
 import Shop from './pages/Shop';
-import MyAccount from './pages/MyAccount';
+import Wishlist from './pages/Wishlist';
 import Checkout1 from './pages/Checkout1';
 import Cart from './pages/Cart';
+import DashboardNew from './pages/DashboardNew';
+import About from './pages/About';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,8 +38,10 @@ function App() {
         <Route path="/cause" element={<Cause />} />
         <Route path="/signup-login" element={<SignupLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/myAccount" element={<MyAccount />} />
+        <Route path="/dashboard-new" element={<DashboardNew />} />
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/about" element={<About />} />
 
         <Route path="/products/:productId" element={<ProductDetails />} />
         <Route path="/designer" element={<Designer />} />

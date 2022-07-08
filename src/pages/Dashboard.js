@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CChart } from '@coreui/react-chartjs';
+// import { CChart } from '@coreui/react-chartjs';
 
 import '../css/dashboard.css';
 
@@ -96,7 +96,7 @@ const Dashboard = () => {
         </nav>
 
         <div className="home-content">
-          <div className="charts-container">
+          {/* <div className="charts-container">
             <CChart
               className="chart"
               style={{ border: '1px solid white', width: '95%' }}
@@ -147,7 +147,7 @@ const Dashboard = () => {
               }}
               labels="months"
             />
-          </div>
+          </div> */}
 
           <div className="overview-boxes">
             <div className="box">

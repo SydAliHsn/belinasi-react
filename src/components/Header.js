@@ -1,23 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { getCart, removeProduct } from '../utils/cart';
+import { getCart, removeFromCart } from '../utils/cart';
+import { getWishlist } from '../utils/wishlist';
 
 const Header = () => {
   const [minicartActive, setMinicartActive] = useState(false);
   const [mobileHeaderActive, setMobileHeaderActive] = useState(false);
   const [headerSticky, setHeaderSticky] = useState(false);
-  const [cartProducts, setCartProducts] = useState(getCart());
+  const [cartProducts, setCartProducts] = useState([]);
+  const [wishlistProducts, setWishlistProducts] = useState([]);
 
   setInterval(() => {
     window.scrollY > 200 ? setHeaderSticky(true) : setHeaderSticky(false);
   }, 100);
 
   useEffect(() => {
+    document.body.addEventListener('click', e => {
+      if (e.target.classList.contains('mobile_menu_open')) {
+        setMinicartActive(false);
+        setMobileHeaderActive(false);
+      }
+    });
+
     if (mobileHeaderActive || minicartActive) {
       document.querySelector('body').classList.add('mobile_menu_open');
     } else document.querySelector('body').classList.remove('mobile_menu_open');
   }, [mobileHeaderActive, minicartActive]);
+
+  useEffect(() => {
+    // Set cart products
+    (async function() {
+      const cart = await getCart();
+      setCartProducts(cart);
+    })();
+
+    // Set wishlist products
+    (async function() {
+      const cart = await getWishlist();
+      setWishlistProducts(cart);
+    })();
+  }, []);
 
   const toggleSubmenu = e => {
     e.target.classList.toggle('active');
@@ -28,14 +51,15 @@ const Header = () => {
   };
 
   const renderMinicartProducts = () => {
-    const removeCartProduct = e => {
+    const remove = async e => {
       const productId = e.target
         .closest('.minicart__product--items')
         .getAttribute('productId');
 
-      removeProduct(productId);
+      removeFromCart(productId);
 
-      setCartProducts(getCart());
+      const newCart = await getCart();
+      setCartProducts(newCart);
     };
 
     const products = cartProducts.map(product => {
@@ -57,11 +81,10 @@ const Header = () => {
               <span class="current__price">${product.price}</span>
             </div>
             <div class="minicart__text--footer d-flex align-items-center">
-              <div class="quantity__box minicart__quantity">1</div>
-              <button
-                class="minicart__product--remove"
-                onClick={removeCartProduct}
-              >
+              <div class="quantity__box minicart__quantity">
+                {product.quantity}
+              </div>
+              <button class="minicart__product--remove" onClick={remove}>
                 Remove
               </button>
             </div>
@@ -222,6 +245,12 @@ const Header = () => {
   };
 
   const renderMinicart = () => {
+    const total = cartProducts.length
+      ? cartProducts.reduce((total, prod) => {
+          return total + +prod.price * prod.quantity;
+        }, 0)
+      : 0;
+
     return (
       <div
         className={'offCanvas__minicart ' + (minicartActive ? 'active' : '')}
@@ -253,33 +282,47 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Start Minicart products  */}
-        {renderMinicartProducts()}
-        {/* End Minicart products */}
-
-        <div class="minicart__amount">
-          <div class="minicart__amount_list d-flex justify-content-between">
-            <span>Sub Total:</span>
-            <span>
-              <b>$240.00</b>
-            </span>
+        {!cartProducts.length ? (
+          <div
+            style={{
+              marginTop: '3rem',
+              textAlign: 'center'
+            }}
+          >
+            <p className="text-main"> No products here!</p>
+            <Link to="/shop" className="primary__btn">
+              Continue Shopping
+            </Link>
           </div>
-          <div class="minicart__amount_list d-flex justify-content-between">
-            <span>Total:</span>
-            <span>
-              <b>$240.00</b>
-            </span>
-          </div>
-        </div>
-
-        <div class="minicart__button-container d-flex justify-content-center">
-          <Link class="primary__btn minicart__button--link" to="/cart">
-            View cart
-          </Link>
-          <Link class="primary__btn minicart__button--link" to="/checkout">
-            Checkout
-          </Link>
-        </div>
+        ) : (
+          <React.Fragment>
+            {/* Start Minicart products  */}
+            {renderMinicartProducts()}
+            {/* End Minicart products */}
+            <div class="minicart__amount">
+              <div class="minicart__amount_list d-flex justify-content-between">
+                <span>Sub Total:</span>
+                <span>
+                  <b>${total}</b>
+                </span>
+              </div>
+              <div class="minicart__amount_list d-flex justify-content-between">
+                <span>Total:</span>
+                <span>
+                  <b>${total}</b>
+                </span>
+              </div>
+            </div>
+            <div class="minicart__button-container d-flex justify-content-center">
+              <Link class="primary__btn minicart__button--link" to="/cart">
+                View cart
+              </Link>
+              <Link class="primary__btn minicart__button--link" to="/checkout">
+                Checkout
+              </Link>
+            </div>
+          </React.Fragment>
+        )}
       </div>
     );
   };
@@ -393,7 +436,7 @@ const Header = () => {
                   </Link>
                 </li>
                 <li class="header__account--items d-none d-lg-block">
-                  <Link class="header__account--btn" to="myAccount#wishlist">
+                  <Link class="header__account--btn" to="/wishlist">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="28.51"
@@ -410,7 +453,14 @@ const Header = () => {
                       ></path>
                     </svg>
                     <span class="header__account--btn__text"> Wish List</span>
-                    <span class="items__count wishlist">02</span>
+
+                    {wishlistProducts.length ? (
+                      <span class="items__count wishlist">
+                        {wishlistProducts.length}
+                      </span>
+                    ) : (
+                      ''
+                    )}
                   </Link>
                 </li>
                 <li class="header__account--items">
@@ -449,7 +499,11 @@ const Header = () => {
                       </g>
                     </svg>
                     <span class="header__account--btn__text"> My cart</span>
-                    <span class="items__count">02</span>
+                    {cartProducts.length ? (
+                      <span class="items__count">{cartProducts.length}</span>
+                    ) : (
+                      ''
+                    )}
                   </a>
                 </li>
               </ul>
@@ -613,7 +667,7 @@ const Header = () => {
                   </Link>
                 </li>
                 <li class="header__account--items header__account2--items d-none d-lg-block">
-                  <Link class="header__account--btn" to="/myAccount#wishlist">
+                  <Link class="header__account--btn" to="/wishlist">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="28.51"
@@ -629,7 +683,13 @@ const Header = () => {
                         stroke-width="32"
                       ></path>
                     </svg>
-                    <span class="items__count wishlist style2">02</span>
+                    {wishlistProducts.length ? (
+                      <span class="items__count wishlist style2">
+                        {wishlistProducts.length}
+                      </span>
+                    ) : (
+                      ''
+                    )}
                   </Link>
                 </li>
                 <li class="header__account--items header__account2--items">
@@ -667,7 +727,13 @@ const Header = () => {
                         </g>
                       </g>
                     </svg>
-                    <span class="items__count style2">02</span>
+                    {cartProducts.length ? (
+                      <span class="items__count wishlist style2">
+                        {cartProducts.length}
+                      </span>
+                    ) : (
+                      ''
+                    )}
                   </a>
                 </li>
               </ul>
@@ -879,10 +945,7 @@ const Header = () => {
             </a>
           </li>
           <li class="offcanvas__stikcy--toolbar__list">
-            <Link
-              class="offcanvas__stikcy--toolbar__btn"
-              to="/myAccount#wishlist"
-            >
+            <Link class="offcanvas__stikcy--toolbar__btn" to="/wishlist">
               <span class="offcanvas__stikcy--toolbar__icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

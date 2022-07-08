@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { addToCart, addToWishlist } from '../utils';
+// import { addToCart, addToWishlist } from '../utils';
+import { addToCart } from '../utils/cart';
+import { addToWishlist } from '../utils/wishlist';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 
-const MyAccount = () => {
+const Wishlist = () => {
   return (
     <React.Fragment>
       <Header />
@@ -19,7 +21,7 @@ const MyAccount = () => {
               <div class="col">
                 <div class="breadcrumb__content text-center">
                   <h1 class="breadcrumb__content--title text-white mb-25">
-                    My Account
+                    Wishlist
                   </h1>
                   <ul class="breadcrumb__content--menu d-flex justify-content-center">
                     <li class="breadcrumb__content--menu__items">
@@ -373,4 +375,4 @@ const MyAccount = () => {
   );
 };
 
-export default MyAccount;
+export default Wishlist;

@@ -7,9 +7,19 @@ import 'swiper/swiper-bundle.css';
 SwiperCore.use([Navigation, Pagination]);
 
 const Testimonials = () => {
+  let slidesPerView = 3;
+
+  if (window.screen.width < 1030) slidesPerView = 2;
+  if (window.screen.width < 600) slidesPerView = 1;
+
   return (
     <div class="testimonial__section--inner testimonial__swiper--activation swiper">
-      <Swiper class="swiper-wrapper" pagination navigation>
+      <Swiper
+        class="swiper-wrapper"
+        pagination
+        navigation
+        slidesPerView={slidesPerView}
+      >
         <SwiperSlide class="swiper-slide">
           <div class="testimonial__items text-center">
             <div class="testimonial__items--thumbnail">
@@ -22,7 +32,14 @@ const Testimonials = () => {
             <div class="testimonial__items--content">
               <h3 class="testimonial__items--title">Nike Mardson</h3>
               <span class="testimonial__items--subtitle">fashion</span>
-              <p class="testimonial__items--desc">
+              <p
+                class="testimonial__items--desc"
+                style={{
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  width: '80%'
+                }}
+              >
                 Lorem ipsum dolor sit amet, consectetur adipisicin elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                 enim ad minim
@@ -137,7 +154,14 @@ const Testimonials = () => {
             <div class="testimonial__items--content">
               <h3 class="testimonial__items--title">Laura Johnson</h3>
               <span class="testimonial__items--subtitle">fashion</span>
-              <p class="testimonial__items--desc">
+              <p
+                class="testimonial__items--desc"
+                style={{
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  width: '80%'
+                }}
+              >
                 Lorem ipsum dolor sit amet, consectetur adipisicin elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                 enim ad minim
@@ -252,7 +276,14 @@ const Testimonials = () => {
             <div class="testimonial__items--content">
               <h3 class="testimonial__items--title">Richard Smith</h3>
               <span class="testimonial__items--subtitle">fashion</span>
-              <p class="testimonial__items--desc">
+              <p
+                class="testimonial__items--desc"
+                style={{
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  width: '80%'
+                }}
+              >
                 Lorem ipsum dolor sit amet, consectetur adipisicin elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                 enim ad minim
@@ -367,7 +398,14 @@ const Testimonials = () => {
             <div class="testimonial__items--content">
               <h3 class="testimonial__items--title">Nike Mardson</h3>
               <span class="testimonial__items--subtitle">fashion</span>
-              <p class="testimonial__items--desc">
+              <p
+                class="testimonial__items--desc"
+                style={{
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  width: '80%'
+                }}
+              >
                 Lorem ipsum dolor sit amet, consectetur adipisicin elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                 enim ad minim

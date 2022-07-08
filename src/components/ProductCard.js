@@ -1,14 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const ProductCard = ({ product }) => {
-  const addToCart = id => {
-    console.log('added to cart');
-  };
-  const addToWishlist = id => {
-    console.log('added to wishlist');
-  };
+import { addToCart } from '../utils/cart';
+import { addToWishlist } from '../utils/wishlist';
 
+const ProductCard = ({ product }) => {
   return (
     <div class="product__items" product-id={product.id}>
       <div class="product__items--thumbnail">
@@ -62,7 +58,9 @@ const ProductCard = ({ product }) => {
             <a
               class="product__items--action__btn add__to--cart"
               //   href="cart.html"
-              onClick={() => addToCart(product.id)}
+              onClick={() => {
+                addToCart(product.id);
+              }}
             >
               <svg
                 class="product__items--action__btn--svg"

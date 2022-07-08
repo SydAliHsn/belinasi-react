@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import belinasiApi from '../apis/belinasiApi';
-import Preloader from '../components/Preloader';
+import Spinner from '../components/Spinner';
 
 const sampleProduct = {
   imgs: [
@@ -21,65 +21,80 @@ const sampleProduct = {
 };
 
 const categories = [
-  'adoption',
+  'disabled',
+  'education',
+  'orphanage',
+  'humanity',
+  'animals',
+  'community',
   'religious',
-  'political',
-  'animal-shelter',
-  'schools',
-  'rights',
-  'adoption',
-  'religious',
-  'political',
-  'animal-shelter',
-  'schools',
-  'rights',
-  'animal-shelter',
-  'schools',
-  'rights',
-  'adoption',
-  'religious',
-  'political',
-  'animal-shelter',
-  'schools',
-  'rights'
+  'sports',
+  'lifestyle',
+  'business',
+  'family',
+  'environment',
+  'others'
 ];
 
 const Shop = () => {
   const [pageStatus, setPageStatus] = useState('loading');
-  const [products, setProducts] = useState(null);
-  const [category, setCategory] = useState('random');
+  const [products, setProducts] = useState([]);
+  const [currPage, setCurrPage] = useState(0);
+  const [total, setTotal] = useState(null);
+  const [category, setCategory] = useState('');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     getProducts();
   }, [categories]);
 
+  const loadMore = async () => {
+    setCurrPage(currPage + 1);
+
+    await getProducts();
+  };
+
   const getProducts = async () => {
-    // belinasiApi.get(`/products/${category}`);
+    try {
+      setPageStatus('loading');
 
-    setProducts([
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct,
-      sampleProduct
-    ]);
+      // const { data } = await belinasiApi.get(`/products?category=${category}&page=${currPage+1}`);
+      // setProducts(products, ...data.data.products);
+      // setTotal(data.data.total);
+      // setCurrPage(currPage + 1);
 
-    setPageStatus('loaded');
+      setProducts([
+        ...products,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct,
+        sampleProduct
+      ]);
+
+      setPageStatus('loaded');
+    } catch (err) {
+      setPageStatus('error');
+      console.log(err.message);
+    }
   };
 
   const renderCategories = () => {
     return categories.map(categ => {
       return (
         <span
-          class="widget__tagcloud--link m-2"
+          class={
+            'widget__tagcloud--link m-2 ' + (category === categ ? 'active' : '')
+          }
           style={{ cursor: 'pointer' }}
           onClick={e => setCategory(categ)}
         >
@@ -90,48 +105,16 @@ const Shop = () => {
   };
 
   const renderProducts = type => {
+    // return <Spinner/>;
+
     return products.map(product => {
       return (
-        <div class="col mb-30">
+        <div class="col mb-30 py-1">
           <ProductCard product={product} />
         </div>
       );
     });
-
-    return (
-      <React.Fragment>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-      </React.Fragment>
-    );
   };
-
-  if (pageStatus === 'loading') return <Preloader />;
 
   return (
     <React.Fragment>
@@ -148,7 +131,8 @@ const Shop = () => {
           className="h2"
           style={{
             marginTop: '3rem',
-            marginBottom: '1rem'
+            marginBottom: '1.5rem',
+            paddingLeft: '1rem'
           }}
         >
           Categories
@@ -158,10 +142,26 @@ const Shop = () => {
           style={{
             marginBottom: '8rem',
             display: 'flex',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            alignItems: 'center'
           }}
         >
           {renderCategories()}
+          <p
+            onClick={() => {
+              setCategory('');
+              setCurrPage(0);
+            }}
+            className="reset"
+            style={{
+              fontSize: '2rem',
+              color: '#fff',
+              margin: '0 1.8rem',
+              cursor: 'pointer'
+            }}
+          >
+            RESET
+          </p>
         </div>
 
         <div class="product-container">
@@ -177,8 +177,7 @@ const Shop = () => {
           </div>
         </div>
 
-        <button
-          className="primary__btn"
+        <div
           style={{
             marginTop: '2rem',
             marginBottom: '5rem',
@@ -187,8 +186,24 @@ const Shop = () => {
             marginRight: 'auto'
           }}
         >
-          Load More
-        </button>
+          {pageStatus === 'loading' ? (
+            <Spinner />
+          ) : (
+            <button
+              className="primary__btn"
+              // style={{
+              //   marginTop: '2rem',
+              //   marginBottom: '5rem',
+              //   maxWidth: '20rem',
+              //   marginLeft: 'auto',
+              //   marginRight: 'auto'
+              // }}
+              onClick={loadMore}
+            >
+              Load More
+            </button>
+          )}
+        </div>
       </div>
       <Footer />
     </React.Fragment>

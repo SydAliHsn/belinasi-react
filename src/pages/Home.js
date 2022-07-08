@@ -17,7 +17,7 @@ const Home = () => {
     id: '98df47jk43534',
     subtitle: 'Men, Shirt',
     title: 'Noice Shirt',
-    price: '69$',
+    price: '69',
     sizes: ['xs', 'sm', 'md', 'lg', 'xl'],
     colors: ['red', 'orange', 'yellow', 'blue', 'purple'],
     creator: 'Belo',
