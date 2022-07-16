@@ -5,7 +5,7 @@ import CheckoutSidebar from '../components/CheckoutSidebar';
 import { getCart } from '../utils/cart';
 
 const Checkout1 = () => {
-  const cart = getCart();
+  const cart = [];
 
   const [userProfile, setUserProfile] = useState({
     firstName: '',
@@ -17,7 +17,7 @@ const Checkout1 = () => {
   });
 
   const renderSummaryProducts = () => {
-    return cart.map(product => {
+    return [].map(product => {
       return (
         <tr class="summary__table--items">
           <td class=" summary__table--list">
@@ -26,7 +26,7 @@ const Checkout1 = () => {
                 <a href="product-details.html">
                   <img
                     class="border-radius-5"
-                    src={product.imgs[0]}
+                    src={product.images[0]}
                     alt="cart-product"
                   />
                 </a>
@@ -372,12 +372,9 @@ const Checkout1 = () => {
             <footer class="main__footer checkout__footer">
               <p class="copyright__content">
                 Copyright © 2022{' '}
-                <a
-                  class="copyright__content--link text__secondary"
-                  href="index.html"
-                >
+                <Link class="copyright__content--link text__secondary" to="/">
                   BELINASI
-                </a>
+                </Link>
                 . All Rights Reserved.Design By BELINASI
               </p>
             </footer>

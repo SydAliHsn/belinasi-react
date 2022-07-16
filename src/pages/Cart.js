@@ -4,44 +4,28 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
-import { getCart, setCart, clearCart } from '../utils/cart';
-
-// const sampleProduct = {
-//   imgs: [
-//     'https://images.unsplash.com/photo-1618354691229-88d47f285158?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80',
-//     'https://images.unsplash.com/photo-1618354691438-25bc04584c23?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80'
-//   ],
-
-//   id: '98df47jk43534',
-//   subtitle: 'Men, Shirt',
-//   title: 'Noice Shirt',
-//   price: '69',
-//   quantity: 2,
-//   creator: 'Belo',
-//   selectedColor: 'Yellow',
-//   type: 'Shirt',
-//   selectedStyle: 'Long Sleeve'
-// };
-
-// const sampleCart = [sampleProduct, sampleProduct, sampleProduct, sampleProduct];
+import { getCart, clearCart, addToCart, removeFromCart } from '../utils/cart';
 
 const Cart = () => {
-  // setCart(sampleCart) for testing
-
-  // const [cartProducts, setCartProducts] = useState([]);
+  const [cartProducts, setCartProducts] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // setCartProducts(getCart());
+    (async function() {
+      const cart = await getCart();
+
+      setCartProducts(cart);
+    })();
   }, []);
 
-  const cart = getCart();
+  // const cart = getCart();
+  // const cart = sampleCart;
 
   const renderCartProducts = () => {
-    return cart.map(product => {
+    return cartProducts.map((product, i) => {
       return (
-        <tr class="cart__table--body__items" product={product}>
+        <tr class="cart__table--body__items">
           <td class="cart__table--body__list">
             <div class="cart__product d-flex align-items-center">
               <button
@@ -63,21 +47,19 @@ const Cart = () => {
                 <Link to={`/products/${product.id}`}>
                   <img
                     class="border-radius-5"
-                    src={product.imgs[1]}
+                    src={product.images[0]}
                     alt="cart-product"
                   />
                 </Link>
               </div>
               <div class="cart__content">
                 <h4 class="cart__content--title">
-                  <Link to={`/products/${product.id}`}>{product.title}</Link>
+                  <Link to={`/products/${product.id}`}>{product.name}</Link>
                 </h4>
                 <span class="cart__content--variant">
-                  COLOR: {product.selectedColor}
+                  COLOR: {product.color}
                 </span>
-                <span class="cart__content--variant">
-                  Style: {product.selectedStyle}
-                </span>
+                <span class="cart__content--variant">Type: {product.type}</span>
               </div>
             </div>
           </td>
@@ -89,8 +71,17 @@ const Cart = () => {
               <button
                 type="button"
                 class="quantity__value quickview__value--quantity decrease"
-                aria-label="quantity value"
+                // aria-label="quantity value"
                 value="Decrease Value"
+                onClick={async () => {
+                  const updatedCartProducts = [...cartProducts];
+                  updatedCartProducts[i].quantity--;
+                  setCartProducts(updatedCartProducts);
+
+                  removeFromCart(product.id);
+                  const newCart = await getCart();
+                  setCartProducts(newCart);
+                }}
               >
                 -
               </button>
@@ -105,8 +96,17 @@ const Cart = () => {
               <button
                 type="button"
                 class="quantity__value quickview__value--quantity increase"
-                aria-label="quantity value"
+                // aria-label="quantity value"
                 value="Increase Value"
+                onClick={async () => {
+                  const updatedCartProducts = [...cartProducts];
+                  updatedCartProducts[i].quantity++;
+                  setCartProducts(updatedCartProducts);
+
+                  addToCart(product.id);
+                  const newCart = await getCart();
+                  setCartProducts(newCart);
+                }}
               >
                 +
               </button>
@@ -121,6 +121,12 @@ const Cart = () => {
       );
     });
   };
+
+  const total = cartProducts.length
+    ? cartProducts.reduce((total, prod) => {
+        return total + +prod.price * prod.quantity;
+      }, 0)
+    : 0;
 
   return (
     <React.Fragment>
@@ -180,7 +186,14 @@ const Cart = () => {
                         <Link class="continue__shopping--link" to="/shop">
                           Continue shopping
                         </Link>
-                        <button class="continue__shopping--clear" type="submit">
+                        <button
+                          class="continue__shopping--clear"
+                          type="submit"
+                          onClick={() => {
+                            clearCart();
+                            setCartProducts([]);
+                          }}
+                        >
                           Clear Cart
                         </button>
                       </div>
@@ -224,7 +237,7 @@ const Cart = () => {
                                 SUBTOTAL
                               </td>
                               <td class="cart__summary--amount text-right">
-                                $860.00
+                                {total} Rp
                               </td>
                             </tr>
                             <tr class="cart__summary--total__list">
@@ -232,7 +245,7 @@ const Cart = () => {
                                 GRAND TOTAL
                               </td>
                               <td class="cart__summary--amount text-right">
-                                $860.00
+                                {total} Rp
                               </td>
                             </tr>
                           </tbody>

@@ -4,30 +4,28 @@ import { Link } from 'react-router-dom';
 import { addToCart } from '../utils/cart';
 import { addToWishlist } from '../utils/wishlist';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart, onAddToWishlist }) => {
   return (
     <div class="product__items" product-id={product.id}>
       <div class="product__items--thumbnail">
         <Link to={`/products/${product.id}`} class="product__items--link">
-          {/* <a class="product__items--link" href="product-details.html"> */}
           <img
             class="product__items--img product__primary--img"
             // src={"assets/img/product/product14.png"}
-            src={product.imgs[0]}
+            src={product.images[0]}
             alt="product-img"
           />
 
-          {product.imgs[1] ? (
+          {product.images[1] ? (
             <img
               class="product__items--img product__secondary--img"
               // src="assets/img/product/product15.png"
-              src={product.imgs[1]}
+              src={product.images[1]}
               alt="product-img"
             />
           ) : (
             ''
           )}
-          {/* </a> */}
         </Link>
         <div class="product__badge">
           <span class="product__badge--items sale">Sale</span>
@@ -35,14 +33,12 @@ const ProductCard = ({ product }) => {
       </div>
       <div class="product__items--content">
         {/* <span class="product__items--content__subtitle">Jacket, Women</span> */}
-        <span class="product__items--content__subtitle">
-          {product.subtitle}
-        </span>
+        <span class="product__items--content__subtitle">{product.type}</span>
 
         <h4 class="product__items--content__title">
           {/* <a href="product-details.html">Western denim shirt</a> */}
           <Link to={`/products/${product.id}`} href="product-details.html">
-            {product.title}
+            {product.name}
           </Link>
         </h4>
 
@@ -50,16 +46,16 @@ const ProductCard = ({ product }) => {
           {/* <span class="current__price">$128</span>
           <span class="price__divided"></span>
           <span class="old__price">$72</span> */}
-          <span class="current__price">{product.price}</span>
+          <span class="current__price">{product.price} Rp</span>
         </div>
 
         <ul class="product__items--action d-flex">
           <li class="product__items--action__list">
             <a
               class="product__items--action__btn add__to--cart"
-              //   href="cart.html"
               onClick={() => {
                 addToCart(product.id);
+                onAddToCart && onAddToCart();
               }}
             >
               <svg
@@ -99,7 +95,11 @@ const ProductCard = ({ product }) => {
             <a
               class="product__items--action__btn"
               //  href="wishlist.html"
-              onClick={() => addToWishlist(product.id)}
+              onClick={() => {
+                addToWishlist(product.id);
+
+                onAddToWishlist && onAddToWishlist();
+              }}
             >
               <svg
                 class="product__items--action__btn--svg"

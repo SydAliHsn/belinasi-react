@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { getCart, removeFromCart } from '../utils/cart';
-import { getWishlist } from '../utils/wishlist';
+import { getCart, getCartQuantity, removeFromCart } from '../utils/cart';
+import { getWishlistQuantity } from '../utils/wishlist';
 
 const Header = () => {
   const [minicartActive, setMinicartActive] = useState(false);
   const [mobileHeaderActive, setMobileHeaderActive] = useState(false);
   const [headerSticky, setHeaderSticky] = useState(false);
   const [cartProducts, setCartProducts] = useState([]);
-  const [wishlistProducts, setWishlistProducts] = useState([]);
 
   setInterval(() => {
-    window.scrollY > 200 ? setHeaderSticky(true) : setHeaderSticky(false);
+    window.scrollY > 100 ? setHeaderSticky(true) : setHeaderSticky(false);
   }, 100);
 
   useEffect(() => {
@@ -34,12 +33,6 @@ const Header = () => {
       const cart = await getCart();
       setCartProducts(cart);
     })();
-
-    // Set wishlist products
-    (async function() {
-      const cart = await getWishlist();
-      setWishlistProducts(cart);
-    })();
   }, []);
 
   const toggleSubmenu = e => {
@@ -56,9 +49,18 @@ const Header = () => {
         .closest('.minicart__product--items')
         .getAttribute('productId');
 
+      const productIndex = cartProducts.findIndex(
+        prod => prod.id === productId
+      );
+
+      let updatedCart = [...cartProducts];
+      updatedCart[productIndex].quantity--;
+      setCartProducts(updatedCart);
+
       removeFromCart(productId);
 
       const newCart = await getCart();
+
       setCartProducts(newCart);
     };
 
@@ -67,7 +69,7 @@ const Header = () => {
         <div class="minicart__product--items d-flex" productId={product.id}>
           <div class="minicart__thumb">
             <Link to={`/products/${product.id}`}>
-              <img src={product.imgs[0]} alt="product-img" />
+              <img src={product.images[0]} alt="product-img" />
             </Link>
           </div>
           <div class="minicart__text">
@@ -314,10 +316,22 @@ const Header = () => {
               </div>
             </div>
             <div class="minicart__button-container d-flex justify-content-center">
-              <Link class="primary__btn minicart__button--link" to="/cart">
+              <Link
+                onClick={() => setMinicartActive(false)}
+                class="primary__btn minicart__button--link"
+                to="/cart"
+              >
                 View cart
               </Link>
-              <Link class="primary__btn minicart__button--link" to="/checkout">
+              <Link
+                class="primary__btn minicart__button--link"
+                to="/checkout"
+                onClick={() =>
+                  document
+                    .querySelector('body')
+                    .classList.remove('mobile_menu_open')
+                }
+              >
                 Checkout
               </Link>
             </div>
@@ -331,6 +345,7 @@ const Header = () => {
     <header class="header__section">
       <div
         class={'main__header header__sticky ' + (headerSticky ? 'sticky' : '')}
+        style={{ zIndex: 199 }}
       >
         <div class="container-fluid">
           <div class="main__header--inner position__relative d-flex justify-content-between align-items-center">
@@ -454,9 +469,9 @@ const Header = () => {
                     </svg>
                     <span class="header__account--btn__text"> Wish List</span>
 
-                    {wishlistProducts.length ? (
+                    {getWishlistQuantity() ? (
                       <span class="items__count wishlist">
-                        {wishlistProducts.length}
+                        {getWishlistQuantity()}
                       </span>
                     ) : (
                       ''
@@ -467,7 +482,15 @@ const Header = () => {
                   <a
                     class="header__account--btn minicart__open--btn"
                     data-offcanvas
-                    onClick={() => setMinicartActive(true)}
+                    onClick={() => {
+                      setMinicartActive(true);
+
+                      // Set cart products
+                      (async function() {
+                        const cart = await getCart();
+                        setCartProducts(cart);
+                      })();
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -500,7 +523,7 @@ const Header = () => {
                     </svg>
                     <span class="header__account--btn__text"> My cart</span>
                     {cartProducts.length ? (
-                      <span class="items__count">{cartProducts.length}</span>
+                      <span class="items__count">{getCartQuantity()}</span>
                     ) : (
                       ''
                     )}
@@ -683,9 +706,9 @@ const Header = () => {
                         stroke-width="32"
                       ></path>
                     </svg>
-                    {wishlistProducts.length ? (
+                    {getWishlistQuantity() ? (
                       <span class="items__count wishlist style2">
-                        {wishlistProducts.length}
+                        {getWishlistQuantity()}
                       </span>
                     ) : (
                       ''
@@ -696,7 +719,15 @@ const Header = () => {
                   <a
                     class="header__account--btn minicart__open--btn"
                     data-offcanvas
-                    onClick={() => setMinicartActive(true)}
+                    onClick={() => {
+                      setMinicartActive(true);
+
+                      // Set cart products
+                      (async function() {
+                        const cart = await getCart();
+                        setCartProducts(cart);
+                      })();
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -727,9 +758,9 @@ const Header = () => {
                         </g>
                       </g>
                     </svg>
-                    {cartProducts.length ? (
+                    {getCartQuantity() ? (
                       <span class="items__count wishlist style2">
-                        {cartProducts.length}
+                        {getCartQuantity()}
                       </span>
                     ) : (
                       ''
@@ -924,7 +955,15 @@ const Header = () => {
             <a
               class="offcanvas__stikcy--toolbar__btn minicart__open--btn"
               data-offcanvas
-              onClick={() => setMinicartActive(true)}
+              onClick={() => {
+                setMinicartActive(true);
+
+                // Set cart products
+                (async function() {
+                  const cart = await getCart();
+                  setCartProducts(cart);
+                })();
+              }}
             >
               <span class="offcanvas__stikcy--toolbar__icon">
                 <svg

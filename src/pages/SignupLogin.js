@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
+import Breadcrumb from '../components/Breadcrumb';
 import belinasiApi from '../apis/belinasiApi';
 
 const SignupLogin = () => {
@@ -19,24 +20,23 @@ const SignupLogin = () => {
   const [signupName, setSignupName] = useState('');
   const [signupRole, setSignupRole] = useState('');
 
+  useEffect(() => window.scrollTo(0, 0), []);
+
   const redirect = () => {
-    const redirectTo = searchParams.get('redirectTo');
+    const redirectTo = searchParams.get('redirectTo') || '/';
 
-    if (!redirectTo) return navigate('/');
-
-    navigate(redirectTo);
+    navigate(redirectTo, { replace: true });
   };
 
-  const login = async () => {
+  const login = async e => {
     try {
-      // const { data } = await belinasiApi.post('/login', {
-      //   email: loginEmail,
-      //   password: loginPassword
-      // });
+      e.preventDefault();
+      const { data } = await belinasiApi.post('/users/login', {
+        email: loginEmail,
+        password: loginPassword
+      });
 
-      // console.log(data);
-
-      console.log('logged in');
+      console.log(data.data);
 
       redirect();
     } catch (err) {
@@ -44,8 +44,9 @@ const SignupLogin = () => {
     }
   };
 
-  const signup = () => {
+  const signup = e => {
     try {
+      e.preventDefault();
       // const { data } = await belinasiApi.post('/signup', {
       //   email: signupEmail,
       //   password: signupPassword,
@@ -70,29 +71,7 @@ const SignupLogin = () => {
 
       <main class="main__content_wrapper">
         {/* <!-- Start breadcrumb section --> */}
-        <section class="breadcrumb__section breadcrumb__bg">
-          <div class="container">
-            <div class="row row-cols-1">
-              <div class="col">
-                <div class="breadcrumb__content text-center">
-                  <h1 class="breadcrumb__content--title text-white mb-25">
-                    Signup Login
-                  </h1>
-                  <ul class="breadcrumb__content--menu d-flex justify-content-center">
-                    <li class="breadcrumb__content--menu__items">
-                      <a class="text-white" href="index.html">
-                        Home
-                      </a>
-                    </li>
-                    <li class="breadcrumb__content--menu__items">
-                      <span class="text-white">Signup Login</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Breadcrumb pageName="Signup Login" />
         {/* <!-- End breadcrumb section --> */}
 
         {/* <!-- Start login section  --> */}
@@ -111,7 +90,7 @@ const SignupLogin = () => {
                       </p>
                     </div>
                     <div class="account__login--inner">
-                      <form class="form--login">
+                      <form class="form--login" onSubmit={login}>
                         <input
                           class="account__login--input login--email"
                           placeholder="Email Address"
@@ -136,7 +115,8 @@ const SignupLogin = () => {
                         </div>
                         <button
                           class="account__login--btn primary__btn"
-                          onClick={login}
+                          // onClick={login}
+                          type="submit"
                         >
                           Login
                         </button>
@@ -175,17 +155,17 @@ const SignupLogin = () => {
 
                 {/* Start Signup Section */}
                 <div class="col">
-                  <form class="form--signup">
-                    <div class="account__login register">
-                      <div class="account__login--header mb-25">
-                        <h2 class="account__login--header__title h3 mb-10">
-                          Create an Account
-                        </h2>
-                        <p class="account__login--header__desc">
-                          Register here if you are a new user
-                        </p>
-                      </div>
-                      <div class="account__login--inner">
+                  <div class="account__login register">
+                    <div class="account__login--header mb-25">
+                      <h2 class="account__login--header__title h3 mb-10">
+                        Create an Account
+                      </h2>
+                      <p class="account__login--header__desc">
+                        Register here if you are a new user
+                      </p>
+                    </div>
+                    <div class="account__login--inner">
+                      <form class="form--signup" onSubmit={signup}>
                         <input
                           class="account__login--input signup--name"
                           placeholder="Name"
@@ -232,13 +212,13 @@ const SignupLogin = () => {
                         </select>
                         <button
                           class="account__login--btn primary__btn mb-10"
-                          onClick={signup}
+                          type="submit"
                         >
                           Submit & Register
                         </button>
-                      </div>
+                      </form>
                     </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>

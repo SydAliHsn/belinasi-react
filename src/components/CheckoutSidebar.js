@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { getCart } from '../utils/cart';
 
 const CheckoutSidebar = () => {
-  const cart = getCart();
+  // const cart = getCart() || [];
+  const cart = [];
 
   const renderProducts = () => {
     return cart.map(product => {

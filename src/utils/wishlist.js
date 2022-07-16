@@ -1,20 +1,37 @@
 import belinasiApi from '../apis/belinasiApi';
 
+const getWishlistQuantity = () => {
+  let wishlist = localStorage.getItem('wishlist');
+
+  if (!wishlist) {
+    localStorage.setItem('wishlist', JSON.stringify([]));
+    return [];
+  } else {
+    wishlist = JSON.parse(wishlist);
+  }
+
+  return wishlist.length;
+};
+
 const getWishlist = async () => {
   let wishlist = localStorage.getItem('wishlist');
-  if (!wishlist) return [];
 
-  wishlist = JSON.parse(wishlist);
+  if (!wishlist) {
+    localStorage.setItem('wishlist', JSON.stringify([]));
+    return [];
+  } else {
+    wishlist = JSON.parse(wishlist);
+  }
 
-  // const wishlistHydrated = await Promise.all(
-  //   wishlist.map(async ({ id, quantity }) => {
-  //     const { data } = await belinasiApi.get(`/products/${id}`);
+  const wishlistHydrated = await Promise.all(
+    wishlist.map(async prod => {
+      const { data } = await belinasiApi.get(`/products/${prod}`);
 
-  //     return { ...data.data.product, quantity };
-  //   })
-  // );
+      return { ...data.data.product };
+    })
+  );
 
-  return wishlist;
+  return wishlistHydrated;
 };
 
 const setWishlist = newWishlist => {
@@ -28,9 +45,14 @@ const clearWishlist = () => {
 };
 
 const addToWishlist = productId => {
-  const oldWishlist = JSON.parse(localStorage.getItem('wishlist'));
+  let oldWishlist = JSON.parse(localStorage.getItem('wishlist'));
 
-  if (oldWishlist.contains(productId)) return;
+  if (!oldWishlist) {
+    localStorage.setItem('wishlist', JSON.stringify([]));
+    oldWishlist = [];
+  }
+
+  if (oldWishlist.includes(productId)) return;
 
   setWishlist([...oldWishlist, productId]);
 };
@@ -52,5 +74,6 @@ export {
   setWishlist,
   clearWishlist,
   removeFromWishlist,
-  addToWishlist
+  addToWishlist,
+  getWishlistQuantity
 };

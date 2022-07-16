@@ -13,7 +13,7 @@ import AnimalShelter from './pages/AnimalShelter';
 import Adoption from './pages/Adoption';
 import NotFound from './pages/NotFound';
 import NonProfits from './pages/NonProfits';
-import MissionTrips from './pages/mission-trips';
+import MissionTrips from './pages/MissionTrips';
 import Contact from './pages/Contact';
 import Cause from './pages/Cause';
 import Designer from './pages/Designer';
@@ -23,8 +23,8 @@ import Shop from './pages/Shop';
 import Wishlist from './pages/Wishlist';
 import Checkout1 from './pages/Checkout1';
 import Cart from './pages/Cart';
-import DashboardNew from './pages/DashboardNew';
 import About from './pages/About';
+import MyAccount from './pages/MyAccount';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -38,10 +38,11 @@ function App() {
         <Route path="/cause" element={<Cause />} />
         <Route path="/signup-login" element={<SignupLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard-new" element={<DashboardNew />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/about" element={<About />} />
+
+        <Route path="/myAccount" element={<MyAccount />} />
 
         <Route path="/products/:productId" element={<ProductDetails />} />
         <Route path="/designer" element={<Designer />} />

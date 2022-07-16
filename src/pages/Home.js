@@ -4,73 +4,62 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Testimonials from '../components/Testimonials';
+import Preloader from '../components/Preloader';
+import belinasiApi from '../apis/belinasiApi';
 
 const Home = () => {
+  const [pageStatus, setPageStatus] = useState('loading');
   const [productType, setProductType] = useState('featured');
-
-  const sampleProduct = {
-    imgs: [
-      'https://images.unsplash.com/photo-1618354691229-88d47f285158?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80',
-      'https://images.unsplash.com/photo-1618354691438-25bc04584c23?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80'
-    ],
-
-    id: '98df47jk43534',
-    subtitle: 'Men, Shirt',
-    title: 'Noice Shirt',
-    price: '69',
-    sizes: ['xs', 'sm', 'md', 'lg', 'xl'],
-    colors: ['red', 'orange', 'yellow', 'blue', 'purple'],
-    creator: 'Belo',
-    type: 'Shirt',
-    description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut numquam ullam is ecusandae laborum explicabo id sequi        quisquam, ab sunt deleniti quidem ea animi facilis quod        nostrum odit! Repellendus voluptas suscipit cum harum        dolor sciunt.'
-  };
+  const [newProducts, setNewProducts] = useState([]);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   const renderProducts = type => {
-    return (
-      <React.Fragment>
+    return newProducts.map(product => {
+      return (
         <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
+          <ProductCard
+            product={product}
+            onAddToCart={() => {
+              // Forcing rerender
+              setPageStatus('loading');
+              setTimeout(() => setPageStatus('loaded'), 0);
+            }}
+            onAddToWishlist={() => {
+              // Forcing rerender
+              setPageStatus('loading');
+              setTimeout(() => setPageStatus('loaded'), 0);
+            }}
+          />
         </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-        <div class="col mb-30">
-          <ProductCard product={sampleProduct} />
-        </div>
-      </React.Fragment>
-    );
+      );
+    });
+  };
+
+  const getProducts = async () => {
+    const resArr = await Promise.all([
+      belinasiApi.get('/products/featured'),
+      belinasiApi.get('/products/newlyAdded'),
+      belinasiApi.get('/products/trending')
+    ]);
+
+    setFeaturedProducts(resArr[0].data.data.products);
+    setNewProducts(resArr[1].data.data.products);
+    setTrendingProducts(resArr[2].data.data.products);
+
+    setPageStatus('loaded');
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // renderProducts(productType);
-  }, [productType]);
+    getProducts();
+  }, []);
 
   return (
     <React.Fragment>
+      <Preloader status={pageStatus} />
+
       <Header />
       <main class="main__content_wrapper">
         <section class="banner-start section--padding">

@@ -20,17 +20,15 @@ const NotFound = () => {
             <div class="row row-cols-1">
               <div class="col">
                 <div class="breadcrumb__content text-center">
-                  <h1 class="breadcrumb__content--title text-white mb-25">
-                    Error 404
-                  </h1>
+                  <h1 class="breadcrumb__content--title  mb-25">Error 404</h1>
                   <ul class="breadcrumb__content--menu d-flex justify-content-center">
                     <li class="breadcrumb__content--menu__items">
-                      <Link class="text-white" to={'/'}>
+                      <Link class="" to="/">
                         Home
                       </Link>
                     </li>
                     <li class="breadcrumb__content--menu__items">
-                      <span class="text-white">Error 404</span>
+                      <span class="">Not Found</span>
                     </li>
                   </ul>
                 </div>

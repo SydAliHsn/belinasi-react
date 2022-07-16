@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Preloader = () => {
+const Preloader = ({ status }) => {
   return (
-    <div id="preloader">
+    <div id="preloader" className={status}>
       <div id="ctn-preloader" class="ctn-preloader">
         <div class="animation-preloader">
           <div class="spinner"></div>
