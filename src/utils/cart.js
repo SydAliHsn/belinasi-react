@@ -22,14 +22,13 @@ const getCart = async () => {
   cart = JSON.parse(cart);
 
   const cartHydrated = await Promise.all(
-    cart.map(async ({ id, quantity }) => {
-      const { data } = await belinasiApi.get(`/products/${id}`);
+    cart.map(async ({ product, quantity, color, size }) => {
+      const { data } = await belinasiApi.get(`/products/${product}`);
 
-      return { ...data.data.product, quantity };
+      return { ...data.data.product, quantity, color, size };
     })
   );
 
-  // return cart;
   return cartHydrated;
 };
 
@@ -47,7 +46,7 @@ const removeFromCart = productId => {
   const oldCart = JSON.parse(localStorage.getItem('cart'));
   if (!oldCart) return;
 
-  const productIndex = oldCart.findIndex(prod => prod.id === productId);
+  const productIndex = oldCart.findIndex(prod => prod.product === productId);
   // If the product isn't in the cart
   if (productIndex === -1) return;
 
@@ -74,13 +73,13 @@ const addToCart = (productId, options = {}) => {
     oldCart = JSON.parse(oldCart);
   }
 
-  const productIndex = oldCart.findIndex(prod => prod.id === productId);
+  const productIndex = oldCart.findIndex(prod => prod.product === productId);
   // If product isn't already in cart
   if (productIndex === -1)
     return setCart([
       ...oldCart,
       {
-        id: productId,
+        product: productId,
         quantity: options.quantity || 1,
         size: options.size || 'md',
         color: options.color || 'default'
@@ -112,33 +111,3 @@ export {
   removeFromCart,
   addToCart
 };
-
-// const sampleProduct1 = {
-//   imgs: [
-//     'https://images.unsplash.com/photo-1618354691229-88d47f285158?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80',
-//     'https://images.unsplash.com/photo-1618354691438-25bc04584c23?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80'
-//   ],
-
-//   id: '98df47jk43534',
-//   subtitle: 'Men, Shirt',
-//   title: 'Noice Shirt',
-//   price: '69',
-//   quantity: 2,
-//   creator: 'Belo',
-//   selectedColor: 'Yellow',
-//   type: 'Shirt',
-//   selectedStyle: 'Long Sleeve'
-// };
-
-// const sampleProduct2 = { ...sampleProduct1, id: 'sdh76s8df87' };
-// const sampleProduct3 = { ...sampleProduct1, id: 'sdh26f8df89' };
-// const sampleProduct4 = { ...sampleProduct1, id: 'wdh66ffdf81' };
-
-// const sampleCart = [
-//   sampleProduct1,
-//   sampleProduct2,
-//   sampleProduct3,
-//   sampleProduct4
-// ];
-
-// setCart(sampleCart);

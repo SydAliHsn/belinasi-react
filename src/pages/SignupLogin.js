@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 import Breadcrumb from '../components/Breadcrumb';
 import belinasiApi from '../apis/belinasiApi';
+import Preloader from '../components/Preloader';
 
 const SignupLogin = () => {
   const [searchParams] = useSearchParams();
@@ -13,6 +14,7 @@ const SignupLogin = () => {
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [pageStatus, setPageStatus] = useState('loading');
 
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -20,7 +22,11 @@ const SignupLogin = () => {
   const [signupName, setSignupName] = useState('');
   const [signupRole, setSignupRole] = useState('');
 
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    setPageStatus('loaded');
+  }, []);
 
   const redirect = () => {
     const redirectTo = searchParams.get('redirectTo') || '/';
@@ -31,42 +37,48 @@ const SignupLogin = () => {
   const login = async e => {
     try {
       e.preventDefault();
+      setPageStatus('loading');
+
       const { data } = await belinasiApi.post('/users/login', {
         email: loginEmail,
         password: loginPassword
       });
 
-      console.log(data.data);
-
       redirect();
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message);
+      setPageStatus('loaded');
     }
   };
 
-  const signup = e => {
+  const signup = async e => {
     try {
       e.preventDefault();
-      // const { data } = await belinasiApi.post('/signup', {
-      //   email: signupEmail,
-      //   password: signupPassword,
-      //   passwordConfirm: signupPasswordConfirm,
-      //   name: signupName,
-      //   role: signupRole
-      // });
 
-      // console.log(data);
+      setPageStatus('loading');
+
+      const { data } = await belinasiApi.post('/users/signup', {
+        email: signupEmail,
+        password: signupPassword,
+        passwordConfirm: signupPasswordConfirm,
+        name: signupName,
+        role: signupRole || 'customer'
+      });
 
       console.log('signed up');
 
       redirect();
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message);
+
+      setPageStatus('loaded');
     }
   };
 
   return (
     <React.Fragment>
+      <Preloader status={pageStatus} />
+
       <Header />
 
       <main class="main__content_wrapper">
@@ -208,7 +220,8 @@ const SignupLogin = () => {
                             Role
                           </option>
                           <option value="customer">Customer</option>
-                          <option value="creator">Creator / Seller</option>
+                          <option value="yayasan">Yayasan</option>
+                          <option value="public-figure">Public Figure</option>
                         </select>
                         <button
                           class="account__login--btn primary__btn mb-10"

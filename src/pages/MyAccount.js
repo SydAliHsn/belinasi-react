@@ -22,29 +22,36 @@ const MyAccount = () => {
 
       setPageStatus('loaded');
     } catch (err) {
-      if (err.response.status === 401)
+      err.response.data.message || alert('An error occured!');
+
+      err.response.data.message && alert(err.response.data.message);
+
+      if (err.response.status === 401) {
         navigate('/signup-login?redirectTo=/myAccount', { replace: true });
+      }
 
       setPageStatus('error');
     }
   };
 
-  // for scrolling to top
   useEffect(() => {
+    // for scrolling to top
     window.scrollTo(0, 0);
 
     getOrders();
-
-    setPageStatus('loaded');
   }, []);
 
   const logout = async () => {
     try {
+      setPageStatus('loading');
+
       await belinasiApi.delete('/users/logout');
 
       navigate('/', { replace: true });
     } catch (err) {
-      console.log(err.message);
+      err.response.data.message || alert('An error occured!');
+
+      err.response.data.message && alert(err.response.data.message);
     }
   };
 
@@ -116,7 +123,9 @@ const MyAccount = () => {
         <section className="my__account--section section--padding">
           <div className="container">
             <p className="account__welcome--text">
-              Hello, Admin welcome to your dashboard!
+              {orders.length
+                ? ` Hello, ${orders[0].user.name} welcome to your dashboard!`
+                : ''}
             </p>
             <div className="my__account--section__inner border-radius-10 d-flex">
               <div className="account__left--sidebar">

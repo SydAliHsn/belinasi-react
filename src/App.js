@@ -22,9 +22,11 @@ import Dashboard from './pages/Dashboard';
 import Shop from './pages/Shop';
 import Wishlist from './pages/Wishlist';
 import Checkout1 from './pages/Checkout1';
+import Checkout2 from './pages/Checkout2';
 import Cart from './pages/Cart';
 import About from './pages/About';
 import MyAccount from './pages/MyAccount';
+import Checkout3 from './pages/Checkout3';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -48,6 +50,8 @@ function App() {
         <Route path="/designer" element={<Designer />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/checkout" element={<Checkout1 />} />
+        <Route path="/checkout/:orderId" element={<Checkout2 />} />
+        <Route path="/checkout/finish" element={<Checkout3 />} />
 
         {/* Fundraising */}
         <Route path="/fundraising" element={<Fundraising />} />

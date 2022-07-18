@@ -3,12 +3,9 @@ import { Link } from 'react-router-dom';
 
 import { getCart } from '../utils/cart';
 
-const CheckoutSidebar = () => {
-  // const cart = getCart() || [];
-  const cart = [];
-
+const CheckoutSidebar = ({ cartProducts, total }) => {
   const renderProducts = () => {
-    return cart.map(product => {
+    return cartProducts.map(product => {
       return (
         <tr class="cart__table--body__items">
           <td class="cart__table--body__list">
@@ -17,7 +14,7 @@ const CheckoutSidebar = () => {
                 <Link to={`/products/${product.id}`}>
                   <img
                     class="border-radius-5"
-                    src={product.imgs[0]}
+                    src={product.images[0]}
                     alt="cart-product"
                   />
                 </Link>
@@ -36,11 +33,19 @@ const CheckoutSidebar = () => {
             </div>
           </td>
           <td class="cart__table--body__list">
-            <span class="cart__price">${product.quantity * product.price}</span>
+            <span class="cart__price">
+              {product.quantity * product.price} Rp
+            </span>
           </td>
         </tr>
       );
     });
+  };
+
+  const getTotal = () => {
+    return cartProducts.reduce((amount, el) => {
+      return amount + el.price * el.quantity;
+    }, 0);
   };
 
   return (
@@ -72,7 +77,9 @@ const CheckoutSidebar = () => {
           <tbody class="checkout__total--body">
             <tr class="checkout__total--items">
               <td class="checkout__total--title text-left">Subtotal </td>
-              <td class="checkout__total--amount text-right">$860.00</td>
+              <td class="checkout__total--amount text-right">
+                {total || getTotal()} Rp
+              </td>
             </tr>
             <tr class="checkout__total--items">
               <td class="checkout__total--title text-left">Shipping</td>
@@ -87,7 +94,7 @@ const CheckoutSidebar = () => {
                 Total
               </td>
               <td class="checkout__total--footer__amount checkout__total--footer__list text-right">
-                $860.00
+                {total || getTotal()} Rp
               </td>
             </tr>
           </tfoot>

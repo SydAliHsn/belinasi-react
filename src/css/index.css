@@ -9665,7 +9665,7 @@ details > summary::-webkit-details-marker {
   width: 100%;
   border: 0;
   height: 4.5rem;
-  color: var(--text-dark-gray-color);
+  color: var(--border-color2);
   /* padding: 1.6rem 1.5rem 0.5rem; */
   padding-left: 1.5rem;
   border: 1px solid var(--border-color2);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+import Spinner from './Spinner';
+
 import { getCart, getCartQuantity, removeFromCart } from '../utils/cart';
 import { getWishlistQuantity } from '../utils/wishlist';
 
@@ -9,6 +11,7 @@ const Header = () => {
   const [mobileHeaderActive, setMobileHeaderActive] = useState(false);
   const [headerSticky, setHeaderSticky] = useState(false);
   const [cartProducts, setCartProducts] = useState([]);
+  const [cartStatus, setCartStatus] = useState();
 
   setInterval(() => {
     window.scrollY > 100 ? setHeaderSticky(true) : setHeaderSticky(false);
@@ -26,14 +29,6 @@ const Header = () => {
       document.querySelector('body').classList.add('mobile_menu_open');
     } else document.querySelector('body').classList.remove('mobile_menu_open');
   }, [mobileHeaderActive, minicartActive]);
-
-  useEffect(() => {
-    // Set cart products
-    (async function() {
-      const cart = await getCart();
-      setCartProducts(cart);
-    })();
-  }, []);
 
   const toggleSubmenu = e => {
     e.target.classList.toggle('active');
@@ -59,9 +54,12 @@ const Header = () => {
 
       removeFromCart(productId);
 
-      const newCart = await getCart();
-
-      setCartProducts(newCart);
+        setCartStatus('loading')
+        
+        const newCart = await getCart();
+        
+        setCartProducts(newCart);
+        setCartStatus('loaded')
     };
 
     const products = cartProducts.map(product => {
@@ -253,6 +251,64 @@ const Header = () => {
         }, 0)
       : 0;
 
+    const renderContent = () => {
+      if (cartStatus === 'loading')
+        return <Spinner />;
+
+      return !cartProducts.length ? (
+        <div
+          style={{
+            marginTop: '3rem',
+            textAlign: 'center'
+          }}
+        >
+          <p className="text-main"> No products here!</p>
+          <Link to="/shop" className="primary__btn">
+            Continue Shopping
+          </Link>
+        </div>
+      ) : (
+        <React.Fragment>
+          {renderMinicartProducts()}
+
+          <div class="minicart__amount">
+            <div class="minicart__amount_list d-flex justify-content-between">
+              <span>Sub Total:</span>
+              <span>
+                <b>${total}</b>
+              </span>
+            </div>
+            <div class="minicart__amount_list d-flex justify-content-between">
+              <span>Total:</span>
+              <span>
+                <b>${total}</b>
+              </span>
+            </div>
+          </div>
+          <div class="minicart__button-container d-flex justify-content-center">
+            <Link
+              onClick={() => setMinicartActive(false)}
+              class="primary__btn minicart__button--link"
+              to="/cart"
+            >
+              View cart
+            </Link>
+            <Link
+              class="primary__btn minicart__button--link"
+              to="/checkout"
+              onClick={() =>
+                document
+                  .querySelector('body')
+                  .classList.remove('mobile_menu_open')
+              }
+            >
+              Checkout
+            </Link>
+          </div>
+        </React.Fragment>
+      );
+    };
+
     return (
       <div
         className={'offCanvas__minicart ' + (minicartActive ? 'active' : '')}
@@ -284,59 +340,7 @@ const Header = () => {
           </div>
         </div>
 
-        {!cartProducts.length ? (
-          <div
-            style={{
-              marginTop: '3rem',
-              textAlign: 'center'
-            }}
-          >
-            <p className="text-main"> No products here!</p>
-            <Link to="/shop" className="primary__btn">
-              Continue Shopping
-            </Link>
-          </div>
-        ) : (
-          <React.Fragment>
-            {/* Start Minicart products  */}
-            {renderMinicartProducts()}
-            {/* End Minicart products */}
-            <div class="minicart__amount">
-              <div class="minicart__amount_list d-flex justify-content-between">
-                <span>Sub Total:</span>
-                <span>
-                  <b>${total}</b>
-                </span>
-              </div>
-              <div class="minicart__amount_list d-flex justify-content-between">
-                <span>Total:</span>
-                <span>
-                  <b>${total}</b>
-                </span>
-              </div>
-            </div>
-            <div class="minicart__button-container d-flex justify-content-center">
-              <Link
-                onClick={() => setMinicartActive(false)}
-                class="primary__btn minicart__button--link"
-                to="/cart"
-              >
-                View cart
-              </Link>
-              <Link
-                class="primary__btn minicart__button--link"
-                to="/checkout"
-                onClick={() =>
-                  document
-                    .querySelector('body')
-                    .classList.remove('mobile_menu_open')
-                }
-              >
-                Checkout
-              </Link>
-            </div>
-          </React.Fragment>
-        )}
+        {renderContent()}
       </div>
     );
   };
@@ -482,14 +486,14 @@ const Header = () => {
                   <a
                     class="header__account--btn minicart__open--btn"
                     data-offcanvas
-                    onClick={() => {
+                    onClick={async () => {
                       setMinicartActive(true);
+                      setCartStatus('loading');
 
-                      // Set cart products
-                      (async function() {
-                        const cart = await getCart();
-                        setCartProducts(cart);
-                      })();
+                      const cart = await getCart();
+                      setCartProducts(cart);
+
+                      setCartStatus('loaded');
                     }}
                   >
                     <svg
@@ -522,7 +526,7 @@ const Header = () => {
                       </g>
                     </svg>
                     <span class="header__account--btn__text"> My cart</span>
-                    {cartProducts.length ? (
+                    {getCartQuantity() ? (
                       <span class="items__count">{getCartQuantity()}</span>
                     ) : (
                       ''
@@ -719,14 +723,15 @@ const Header = () => {
                   <a
                     class="header__account--btn minicart__open--btn"
                     data-offcanvas
-                    onClick={() => {
+                    onClick={async () => {
                       setMinicartActive(true);
+                      setCartStatus('loading');
 
                       // Set cart products
-                      (async function() {
-                        const cart = await getCart();
-                        setCartProducts(cart);
-                      })();
+                      const cart = await getCart();
+                      setCartProducts(cart);
+
+                      setCartStatus('loaded');
                     }}
                   >
                     <svg
@@ -955,14 +960,15 @@ const Header = () => {
             <a
               class="offcanvas__stikcy--toolbar__btn minicart__open--btn"
               data-offcanvas
-              onClick={() => {
+              onClick={async () => {
                 setMinicartActive(true);
+                setCartStatus('loading');
 
                 // Set cart products
-                (async function() {
-                  const cart = await getCart();
-                  setCartProducts(cart);
-                })();
+                const cart = await getCart();
+                setCartProducts(cart);
+
+                setCartStatus('loaded');
               }}
             >
               <span class="offcanvas__stikcy--toolbar__icon">
