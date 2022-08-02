@@ -6,15 +6,17 @@ import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 import Breadcrumb from '../components/Breadcrumb';
 import belinasiApi from '../apis/belinasiApi';
-import Preloader from '../components/Preloader';
+import Spinner from '../components/Spinner';
 
 const SignupLogin = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const [loginStatus, setLoginStatus] = useState();
+  const [signupStatus, setSignupStatus] = useState();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [pageStatus, setPageStatus] = useState('loading');
 
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -24,30 +26,43 @@ const SignupLogin = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-
-    setPageStatus('loaded');
   }, []);
 
-  const redirect = () => {
-    const redirectTo = searchParams.get('redirectTo') || '/';
+  const redirect = (type, name) => {
+    let redirectTo = searchParams.get('redirectTo') || '/';
+
+    redirectTo +=
+      type === 'signedIn'
+        ? `?success=Thanks ${name} for Signing Up to Belinasi!`
+        : `?success=Welcome Back ${name}! Let's continue Buying %26 Donating.`;
 
     navigate(redirectTo, { replace: true });
+  };
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
   };
 
   const login = async e => {
     try {
       e.preventDefault();
-      setPageStatus('loading');
+
+      setLoginStatus('loading');
 
       const { data } = await belinasiApi.post('/users/login', {
         email: loginEmail,
         password: loginPassword
       });
 
-      redirect();
+      localStorage.setItem('userId', data.data.user.id);
+      setLoginStatus('loggedIn');
+
+      redirect('loggedIn', data.data.user.name);
     } catch (err) {
-      alert(err.response.data.message);
-      setPageStatus('loaded');
+      setLoginStatus('error');
+
+      createNotif('error', err.response.data.message);
     }
   };
 
@@ -55,7 +70,16 @@ const SignupLogin = () => {
     try {
       e.preventDefault();
 
-      setPageStatus('loading');
+      setSignupStatus('loading');
+
+      if (signupPassword !== signupPasswordConfirm) {
+        createNotif('error', 'Both passwords must be the same!');
+        return setSignupStatus('error');
+      }
+      if (!signupRole) {
+        createNotif('error', 'Please specify the role / type for the account.');
+        return setSignupStatus('error');
+      }
 
       const { data } = await belinasiApi.post('/users/signup', {
         email: signupEmail,
@@ -65,20 +89,18 @@ const SignupLogin = () => {
         role: signupRole || 'customer'
       });
 
-      console.log('signed up');
+      localStorage.setItem('userId', data.data.user.id);
+      setSignupStatus('signedIn');
 
-      redirect();
+      redirect('signedIn', data.data.user.name);
     } catch (err) {
-      alert(err.response.data.message);
-
-      setPageStatus('loaded');
+      setSignupStatus('error');
+      createNotif('error', err.response.data.message);
     }
   };
 
   return (
     <React.Fragment>
-      <Preloader status={pageStatus} />
-
       <Header />
 
       <main class="main__content_wrapper">
@@ -115,6 +137,7 @@ const SignupLogin = () => {
                           value={loginPassword}
                           onChange={e => setLoginPassword(e.target.value)}
                           type="password"
+                          placeholder={'Password'}
                           required
                         />
                         <div class="account__login--remember__forgot mb-15 d-flex justify-content-between align-items-center">
@@ -125,13 +148,25 @@ const SignupLogin = () => {
                             Forgot Your Password?
                           </a>
                         </div>
-                        <button
-                          class="account__login--btn primary__btn"
-                          // onClick={login}
-                          type="submit"
-                        >
-                          Login
-                        </button>
+
+                        {loginStatus === 'loading' ? (
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Spinner />
+                          </div>
+                        ) : (
+                          <button
+                            class="account__login--btn primary__btn"
+                            // onClick={login}
+                            type="submit"
+                          >
+                            Login
+                          </button>
+                        )}
                       </form>
                       <div class="account__login--divide">
                         <span class="account__login--divide__text">OR</span>
@@ -197,6 +232,7 @@ const SignupLogin = () => {
                         <input
                           class="account__login--input signup--password"
                           type="password"
+                          placeholder={'Password'}
                           value={signupPassword}
                           onChange={e => setSignupPassword(e.target.value)}
                           required
@@ -223,12 +259,24 @@ const SignupLogin = () => {
                           <option value="yayasan">Yayasan</option>
                           <option value="public-figure">Public Figure</option>
                         </select>
-                        <button
-                          class="account__login--btn primary__btn mb-10"
-                          type="submit"
-                        >
-                          Submit & Register
-                        </button>
+
+                        {signupStatus === 'loading' ? (
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Spinner />
+                          </div>
+                        ) : (
+                          <button
+                            class="account__login--btn primary__btn mb-10"
+                            type="submit"
+                          >
+                            Submit & Register
+                          </button>
+                        )}
                       </form>
                     </div>
                   </div>

@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { addToCart } from '../utils/cart';
-import {
-  addToWishlist,
-  removeFromWishlist,
-  getWishlist
-} from '../utils/wishlist';
+import { removeFromWishlist, getWishlist } from '../utils/wishlist';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -15,7 +11,13 @@ import Preloader from '../components/Preloader';
 
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [pageStatus, setPageStatus] = useState('loading');
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     (async function() {
@@ -85,11 +87,11 @@ const Wishlist = () => {
               onClick={() => {
                 addToCart(prod.id);
 
-                let updatedWishlist = [...wishlistProducts];
-                updatedWishlist.splice(i, 1);
-                setWishlistProducts(updatedWishlist);
-
-                removeFromWishlist(prod.id);
+                searchParams.append('minicart', true);
+                createNotif(
+                  'success',
+                  `${prod.name} (${prod.type}) added to cart.`
+                );
               }}
             >
               Add To Cart
@@ -117,7 +119,7 @@ const Wishlist = () => {
         <section class="cart__section section--padding">
           <div class="container">
             <div class="cart__section--inner">
-              <form action="#">
+              <div>
                 <h2 class="cart__title mb-40">Wishlist</h2>
                 <div class="cart__table">
                   <table class="cart__table--inner">
@@ -146,7 +148,7 @@ const Wishlist = () => {
                     </Link>
                   </div>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </section>

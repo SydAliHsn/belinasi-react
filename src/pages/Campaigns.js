@@ -3,10 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ProductCard from '../components/ProductCard';
+import CampaignCard from '../components/CampaignCard';
 import belinasiApi from '../apis/belinasiApi';
 import Spinner from '../components/Spinner';
 import Preloader from '../components/Preloader';
+import Breadcrumb from '../components/Breadcrumb';
 
 const categories = [
   'disabled',
@@ -25,11 +26,11 @@ const categories = [
   'all'
 ];
 
-const Shop = () => {
+const Campaigns = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [productsStatus, setProductsStatus] = useState('loading');
-  const [products, setProducts] = useState([]);
+  const [campaignsStatus, setCampaignsStatus] = useState('loading');
+  const [campaigns, setCampaigns] = useState([]);
   const [currPage, setCurrPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [category, setCategory] = useState('all');
@@ -39,36 +40,31 @@ const Shop = () => {
   useEffect(() => window.scrollTo(0, 0), []);
 
   useEffect(() => {
-    getProducts();
+    getCampaigns();
   }, [category]);
-
-  // const createNotif = (type, text) => {
-  //   searchParams.append(type, text);
-  //   setSearchParams(searchParams);
-  // };
 
   const loadMore = async () => {
     setCurrPage(currPage + 1);
 
-    await getProducts();
+    await getCampaigns();
   };
 
-  const getProducts = async () => {
+  const getCampaigns = async () => {
     try {
-      setProductsStatus('loading');
+      setCampaignsStatus('loading');
 
-      let url = `/products?page=${currPage + 1}&fields=images,name,type,price`;
+      let url = `/campaigns?page=${currPage + 1}`;
       if (category && category !== 'all') url += `&category=${category}`;
 
       const { data } = await belinasiApi.get(url);
 
-      setProducts([...products, ...data.data.products]);
+      setCampaigns([...campaigns, ...data.data.campaigns]);
       setTotal(data.data.total);
       setCurrPage(currPage + 1);
 
-      setProductsStatus('loaded');
+      setCampaignsStatus('loaded');
     } catch (err) {
-      setProductsStatus('error');
+      setCampaignsStatus('error');
       console.log(err.message);
     }
   };
@@ -85,7 +81,7 @@ const Shop = () => {
             if (categ === category) return;
 
             setCurrPage(0);
-            setProducts([]);
+            setCampaigns([]);
             setTotal(null);
             setCategory(categ);
           }}
@@ -96,8 +92,8 @@ const Shop = () => {
     });
   };
 
-  const renderProducts = () => {
-    if (!products.length && productsStatus !== 'loading')
+  const renderCampaigns = () => {
+    if (!campaigns.length && campaignsStatus !== 'loading')
       return (
         <h2
           style={{
@@ -107,40 +103,40 @@ const Shop = () => {
             border: '2px solid var(--secondary-color)'
           }}
         >
-          No Products Found!
+          No Campaigns Found!
         </h2>
       );
 
-    const productsMarkup = products.map(product => {
+    const campaignsMarkup = campaigns.map(product => {
       return (
         <div class="col mb-30 py-1">
-          <ProductCard product={product} />
+          <CampaignCard campaign={product} />
         </div>
       );
     });
 
     return (
-      <div class="product-container">
+      <div class="campaign-container">
         <div
-          class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n30"
+          class="row row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 mb--n30"
           style={{
             display: 'flex',
             justifyContent: 'center',
             margin: '0 auto'
           }}
         >
-          {productsMarkup}
+          {campaignsMarkup}
         </div>
       </div>
     );
   };
 
   const renderLoadMoreOrSpinner = () => {
-    if (productsStatus === 'loading') return <Spinner />;
+    if (campaignsStatus === 'loading') return <Spinner />;
 
-    if (total === products.length) return null;
+    if (total === campaigns.length) return null;
 
-    if (!(total === products.length)) {
+    if (!(total === campaigns.length)) {
       return (
         <button className="primary__btn" onClick={loadMore}>
           Load More
@@ -154,6 +150,9 @@ const Shop = () => {
       <Preloader status={pageStatus} />
 
       <Header />
+
+      <Breadcrumb pageName={'Campaigns'} />
+
       <div
         className="container"
         style={{
@@ -185,10 +184,10 @@ const Shop = () => {
           <p
             onClick={() => {
               setCurrPage(0);
-              setProducts([]);
+              setCampaigns([]);
               setTotal(null);
               setCategory('');
-              getProducts();
+              getCampaigns();
             }}
             className="reset"
             style={{
@@ -202,7 +201,7 @@ const Shop = () => {
           </p>
         </div>
 
-        {renderProducts()}
+        {renderCampaigns()}
 
         <div
           style={{
@@ -221,4 +220,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default Campaigns;

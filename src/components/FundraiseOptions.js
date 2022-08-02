@@ -24,7 +24,7 @@ const FundraiseOptions = () => {
             <i class="fa-solid fa-graduation-cap"></i>
             <p>Schools</p>
           </Link>
-          <Link to={'/fundraising/nonprofit'} class="options-section__option">
+          <Link to={'/fundraising/nonprofits'} class="options-section__option">
             <i class="fa-solid fa-hand-holding-heart"></i>
             <p>Nonprofits</p>
           </Link>

@@ -19,9 +19,6 @@ const Cart = () => {
     })();
   }, []);
 
-  // const cart = getCart();
-  // const cart = sampleCart;
-
   const renderCartProducts = () => {
     return cartProducts.map((product, i) => {
       return (
@@ -78,7 +75,7 @@ const Cart = () => {
                   updatedCartProducts[i].quantity--;
                   setCartProducts(updatedCartProducts);
 
-                  removeFromCart(product.id);
+                  removeFromCart(product);
                   const newCart = await getCart();
                   setCartProducts(newCart);
                 }}
@@ -103,7 +100,7 @@ const Cart = () => {
                   updatedCartProducts[i].quantity++;
                   setCartProducts(updatedCartProducts);
 
-                  addToCart(product.id);
+                  addToCart(product.id, { ...product, quantity: 1 });
                   const newCart = await getCart();
                   setCartProducts(newCart);
                 }}

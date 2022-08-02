@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, Thumbs } from 'swiper';
 import belinasiApi from '../apis/belinasiApi';
@@ -15,29 +15,12 @@ import { addToWishlist } from '../utils/wishlist';
 
 import paymentImage from '../assets/img/other/safe-checkout.png';
 
-const sampleProduct = {
-  images: [
-    'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
-    'https://images.unsplash.com/photo-1576566588028-4147f3842f27'
-  ],
-
-  _id: '98df47jk43534',
-  id: '98df47jk43534',
-  subtitle: 'Men, Shirt',
-  title: 'Noice Shirt',
-  price: '69$',
-  sizes: ['xs', 'sm', 'md', 'lg', 'xl'],
-  availableColors: ['red', 'orange', 'yellow', 'blue', 'purple'],
-  creator: { name: 'Belo' },
-  type: 'Shirt',
-  description:
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut numquam ullam is ecusandae laborum explicabo id sequi        quisquam, ab sunt deleniti quidem ea animi facilis quod        nostrum odit! Repellendus voluptas suscipit cum harum        dolor sciunt.'
-};
-
 SwiperCore.use([Navigation, Pagination, Thumbs]);
 
 const ProductDetails = () => {
   const { productId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
@@ -48,24 +31,13 @@ const ProductDetails = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [pageStatus, setPageStatus] = useState('loading');
 
-  const getRecommendedProducts = async () => {
+  const getRecommendedProducts = async prod => {
     try {
-      const { data } = await belinasiApi.get(`/products?creator=${product.id}`);
+      const { data } = await belinasiApi.get(
+        `/products?campaign=${prod.campaign.id}&limit=10`
+      );
 
-      // setRecommendedProducts(data.products);
-
-      setRecommendedProducts([
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct,
-        sampleProduct
-      ]);
+      setRecommendedProducts(data.data.products);
     } catch (err) {
       console.log(err);
     }
@@ -77,17 +49,11 @@ const ProductDetails = () => {
 
       setProduct(data.data.product);
 
-      console.log(data.data.product);
-
-      // setProduct(sampleProduct);
-
-      getRecommendedProducts();
+      await getRecommendedProducts(data.data.product);
 
       setPageStatus('loaded');
     } catch (err) {
-      console.log(err.message);
-
-      setPageStatus('error');
+      navigate('/shop?error=Product not found!', { replace: true });
     }
   };
 
@@ -96,15 +62,6 @@ const ProductDetails = () => {
 
     if (!product) getProduct();
   }, []);
-
-  // const addToCart = () => {
-  //   ;
-  //   console.log('add to cart');
-  // };
-
-  // const addToWishlist = () => {
-  //   console.log('add to wishlist');
-  // };
 
   const renderRecommendProducts = () => {
     return recommendedProducts.map(product => {
@@ -243,12 +200,11 @@ const ProductDetails = () => {
                           <strong>Price:</strong> {product.price} Rp
                         </span>
                         <p className="current__price">
-                          <strong>Seller's message:</strong>{' '}
-                          {product.description}
+                          <strong>Seller's message:</strong> {product.message}
                         </p>
                       </div>
                       {/* <p className="product__details--info__desc mb-15">
-                        <strong>Seller's message:</strong> {product.description}
+                        <strong>Seller's message:</strong> {product.message}
                       </p> */}
 
                       <div className="product__variant">
@@ -309,9 +265,11 @@ const ProductDetails = () => {
 
                               addToCart(product.id, options);
 
-                              // Forcing rerender
-                              setPageStatus('loading');
-                              setTimeout(() => setPageStatus('loaded'), 0);
+                              searchParams.set(
+                                'success',
+                                `${product.name} (${product.type}) added to cart.`
+                              );
+                              setSearchParams(searchParams);
                             }}
                           >
                             Add To Cart
@@ -473,7 +431,9 @@ const ProductDetails = () => {
         <section className="product__section product__section--style3 section--padding">
           <div className="container product3__section--container">
             <div className="section__heading text-center mb-50">
-              <h2 className="section__heading--maintitle">You may also like</h2>
+              <h2 className="section__heading--maintitle">
+                More from this Campaign
+              </h2>
             </div>
 
             <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n30">

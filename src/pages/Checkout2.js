@@ -63,7 +63,8 @@ const Checkout2 = () => {
       setCart([]);
 
       // navigate(data.data.transactionUrl, { replace: true });
-      window.open(data.data.transactionUrl);
+      // window.open(data.data.transactionUrl);
+      window.location.replace(data.data.transactionUrl);
 
       setPageStatus('loaded');
     } catch (err) {

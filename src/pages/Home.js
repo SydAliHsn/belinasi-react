@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -9,43 +10,23 @@ import belinasiApi from '../apis/belinasiApi';
 
 const Home = () => {
   const [pageStatus, setPageStatus] = useState('loading');
-  const [productType, setProductType] = useState('featured');
+  // const [productType, setProductType] = useState('featured');
   const [newProducts, setNewProducts] = useState([]);
-  const [trendingProducts, setTrendingProducts] = useState([]);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   const renderProducts = type => {
     return newProducts.map(product => {
       return (
         <div class="col mb-30">
-          <ProductCard
-            product={product}
-            onAddToCart={() => {
-              // Forcing rerender
-              setPageStatus('loading');
-              setTimeout(() => setPageStatus('loaded'), 0);
-            }}
-            onAddToWishlist={() => {
-              // Forcing rerender
-              setPageStatus('loading');
-              setTimeout(() => setPageStatus('loaded'), 0);
-            }}
-          />
+          <ProductCard product={product} />
         </div>
       );
     });
   };
 
   const getProducts = async () => {
-    const resArr = await Promise.all([
-      belinasiApi.get('/products/featured'),
-      belinasiApi.get('/products/newlyAdded'),
-      belinasiApi.get('/products/trending')
-    ]);
+    const { data } = await belinasiApi.get('/products/newlyAdded');
 
-    setFeaturedProducts(resArr[0].data.data.products);
-    setNewProducts(resArr[1].data.data.products);
-    setTrendingProducts(resArr[2].data.data.products);
+    setNewProducts(data.data.products);
 
     setPageStatus('loaded');
   };
@@ -168,7 +149,7 @@ const Home = () => {
         {/* <!-- Start banner section --> */}
         {/* <!--  */}
         {/* <section class="banner__section section--padding"> */}
-        <div class="container-fluid">
+        {/* <div class="container-fluid">
           <div class="row mb--n28">
             <div class="col-lg-5 col-md-order mb-28">
               <div class="banner__items">
@@ -329,7 +310,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* </section> --> */}
         {/* <!-- End banner section --> */}
 
@@ -339,7 +320,7 @@ const Home = () => {
             <div class="section__heading text-center mb-35">
               <h2 class="section__heading--maintitle">New Products</h2>
             </div>
-            <ul class="product__tab--one product__tab--primary__btn d-flex justify-content-center mb-50">
+            {/* <ul class="product__tab--one product__tab--primary__btn d-flex justify-content-center mb-50">
               <li
                 class={
                   'product__tab--primary__btn__list ' +
@@ -373,12 +354,12 @@ const Home = () => {
               >
                 New Arrival
               </li>
-            </ul>
+            </ul> */}
             <div class="tab_content">
               <div id="trending" class="tab_pane show active">
                 <div class="product__section--inner">
                   <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n30">
-                    {renderProducts(productType)}
+                    {renderProducts()}
                   </div>
                 </div>
               </div>

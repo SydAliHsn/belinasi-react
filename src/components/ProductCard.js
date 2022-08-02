@@ -1,17 +1,27 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { addToCart } from '../utils/cart';
-import { addToWishlist } from '../utils/wishlist';
+import {
+  addToWishlist,
+  removeFromWishlist,
+  wishlistProductExists
+} from '../utils/wishlist';
 
-const ProductCard = ({ product, onAddToCart, onAddToWishlist }) => {
+const ProductCard = ({ product }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
+
   return (
     <div class="product__items" product-id={product.id}>
       <div class="product__items--thumbnail">
         <Link to={`/products/${product.id}`} class="product__items--link">
           <img
             class="product__items--img product__primary--img"
-            // src={"assets/img/product/product14.png"}
             src={product.images[0]}
             alt="product-img"
           />
@@ -55,7 +65,15 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist }) => {
               class="product__items--action__btn add__to--cart"
               onClick={() => {
                 addToCart(product.id);
-                onAddToCart && onAddToCart();
+
+                createNotif(
+                  'success',
+                  `${product.name} (${product.type}) added to cart!`
+                );
+
+                searchParams.append('minicart', true);
+                setSearchParams(searchParams);
+                // onAddToCart && onAddToCart();
               }}
             >
               <svg
@@ -93,12 +111,28 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist }) => {
           </li>
           <li class="product__items--action__list">
             <a
-              class="product__items--action__btn"
-              //  href="wishlist.html"
+              class={
+                'product__items--action__btn ' +
+                (wishlistProductExists(product.id) ? 'active' : '')
+              }
               onClick={() => {
+                if (wishlistProductExists(product.id)) {
+                  removeFromWishlist(product.id);
+
+                  return createNotif(
+                    'info',
+                    `${product.name} (${product.type}) removed from wishlist.`
+                  );
+                }
+
                 addToWishlist(product.id);
 
-                onAddToWishlist && onAddToWishlist();
+                createNotif(
+                  'success',
+                  `${product.name} (${product.type}) added to wishlist!`
+                );
+
+                // onAddToWishlist && onAddToWishlist();
               }}
             >
               <svg

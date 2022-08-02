@@ -1,34 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import belinasiApi from '../apis/belinasiApi';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 import Breadcrumb from '../components/Breadcrumb';
 import Preloader from '../components/Preloader';
+import belinasiApi from '../apis/belinasiApi';
 
 const MyAccount = () => {
   const navigate = useNavigate();
 
   const [pageStatus, setPageStatus] = useState('loading');
-  const [orders, setOrders] = useState([]);
+  const [user, setUser] = useState([]);
 
-  const getOrders = async () => {
+  const getUser = async () => {
     try {
-      const { data } = await belinasiApi.get('/orders/userOrders');
+      const { data } = await belinasiApi.get('/users/getMe');
 
-      setOrders(data.data.orders);
+      setUser(data.data.user);
 
       setPageStatus('loaded');
     } catch (err) {
-      err.response.data.message || alert('An error occured!');
+      let errorMessage;
 
-      err.response.data.message && alert(err.response.data.message);
+      if (!err.response.data) {
+        errorMessage = 'An error occured accessing that page! Try again later.';
+        return navigate(`/?error=${errorMessage}`);
+      } else {
+        errorMessage = err.response.data.message;
+      }
 
       if (err.response.status === 401) {
-        navigate('/signup-login?redirectTo=/myAccount', { replace: true });
+        return navigate(
+          `/signup-login?redirectTo=/myAccount&error=${errorMessage}`,
+          {
+            replace: true
+          }
+        );
       }
+
+      return navigate(`/?error=${errorMessage}`);
 
       setPageStatus('error');
     }
@@ -38,7 +52,7 @@ const MyAccount = () => {
     // for scrolling to top
     window.scrollTo(0, 0);
 
-    getOrders();
+    getUser();
   }, []);
 
   const logout = async () => {
@@ -46,6 +60,7 @@ const MyAccount = () => {
       setPageStatus('loading');
 
       await belinasiApi.delete('/users/logout');
+      localStorage.removeItem('userId');
 
       navigate('/', { replace: true });
     } catch (err) {
@@ -55,8 +70,49 @@ const MyAccount = () => {
     }
   };
 
+  const logoutPopup = (
+    <Popup
+      trigger={<a>Log Out</a>}
+      modal
+      contentStyle={{
+        borderRadius: '0.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        minHeight: '20rem',
+        padding: '2rem'
+      }}
+    >
+      {close => (
+        <>
+          <h3 style={{ textAlign: 'center' }}>
+            Are you sure you want to Logout?
+          </h3>
+          <div className="modal-button-container" style={{ margin: '0 auto' }}>
+            <a
+              className="modal__btn"
+              style={{
+                background: 'gray'
+              }}
+              onClick={close}
+            >
+              Cancel
+            </a>
+            <a
+              className="modal__btn"
+              style={{ background: 'red' }}
+              onClick={logout}
+            >
+              Logout
+            </a>
+          </div>
+        </>
+      )}
+    </Popup>
+  );
+
   const renderOrderHistory = () => {
-    const ordersMarkup = orders.map(order => {
+    const ordersMarkup = user.orders.map(order => {
       return (
         <tr className="account__table--body__child">
           <td className="account__table--body__child--items">{order.id}</td>
@@ -80,7 +136,7 @@ const MyAccount = () => {
   };
 
   const renderOrderHistoryMobile = () => {
-    const ordersMarkup = orders.map(order => {
+    const ordersMarkup = user.orders.map(order => {
       return (
         <tr className="account__table--body__child">
           <td className="account__table--body__child--items">
@@ -110,6 +166,8 @@ const MyAccount = () => {
     return ordersMarkup;
   };
 
+  if (pageStatus === 'loading') return <Preloader status={pageStatus} />;
+
   return (
     <React.Fragment>
       <Preloader status={pageStatus} />
@@ -123,9 +181,7 @@ const MyAccount = () => {
         <section className="my__account--section section--padding">
           <div className="container">
             <p className="account__welcome--text">
-              {orders.length
-                ? ` Hello, ${orders[0].user.name} welcome to your dashboard!`
-                : ''}
+              Hello, {user.name} welcome to your dashboard!
             </p>
             <div className="my__account--section__inner border-radius-10 d-flex">
               <div className="account__left--sidebar">
@@ -140,9 +196,7 @@ const MyAccount = () => {
                   <li className="account__menu--list">
                     <Link to="/wishlist">Wishlist</Link>
                   </li>
-                  <li className="account__menu--list">
-                    <a onClick={logout}>Log Out</a>
-                  </li>
+                  <li className="account__menu--list">{logoutPopup}</li>
                 </ul>
               </div>
               <div className="account__wrapper">
@@ -151,7 +205,7 @@ const MyAccount = () => {
                     Orders History
                   </h2>
                   <div className="account__table--area">
-                    {orders.length ? (
+                    {user.orders.length ? (
                       <table className="account__table">
                         <thead className="account__table--header">
                           <tr className="account__table--header__child">

@@ -1,7 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const Footer = () => {
+  const [marginTop, setMarginTop] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const toggleFooterWidget = e => {
     const parent = e.target.parentElement;
     const grandpa = parent.parentElement;
@@ -13,8 +16,36 @@ const Footer = () => {
     } else parent.nextElementSibling.style.display = 'none';
   };
 
+  const createNotif = (type, message) => {
+    searchParams.append(type, message);
+    setSearchParams(searchParams);
+  };
+
+  useEffect(() => {
+    const windowHeight = window.innerHeight;
+    const docHeight =
+      document.height !== undefined
+        ? document.height
+        : document.body.offsetHeight;
+
+    const diff = windowHeight - docHeight;
+
+    if (diff === 0) setMarginTop(125 + 'px');
+  }, []);
+
   return (
-    <footer class="footer__section bg__black">
+    <footer
+      class="footer__section bg__black"
+      style={{
+        marginTop
+        // position: 'absolute',
+        // bottom: 0,
+        // left: 0,
+        // right: 0
+        // // clear: 'both'
+        // // marginTop: '111rem'
+      }}
+    >
       <div class="container-fluid">
         <div class="main__footer d-flex justify-content-between">
           <div class="footer__widget footer__widget--width">
@@ -383,11 +414,22 @@ const Footer = () => {
                 great Saw image stl
               </p>
               <div class="newsletter__subscribe">
-                <form class="newsletter__subscribe--form" action="#">
+                <form
+                  class="newsletter__subscribe--form"
+                  onSubmit={e => {
+                    e.preventDefault();
+
+                    createNotif(
+                      'success',
+                      'Thanks for subscribing to our newsletter!'
+                    );
+                  }}
+                >
                   <label>
                     <input
                       class="newsletter__subscribe--input"
                       placeholder="Email Address"
+                      required
                       type="email"
                     />
                   </label>
@@ -401,11 +443,11 @@ const Footer = () => {
         </div>
         <div class="footer__bottom d-flex justify-content-between align-items-center">
           <p class="copyright__content text-ofwhite m-0">
-            Copyright © 2022
+            Copyright © 2022{' '}
             <a class="copyright__content--link" href="index.html">
               BELINASI
             </a>
-            . All Rights Reserved.Design By BELINASI
+            . All Rights Reserved. Design By BELINASI
           </p>
           <div class="footer__payment text-right">
             <img

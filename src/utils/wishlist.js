@@ -69,11 +69,23 @@ const removeFromWishlist = productId => {
   setWishlist(newWishlist);
 };
 
+const wishlistProductExists = productId => {
+  let wishlist = localStorage.getItem('wishlist');
+  if (!wishlist) return false;
+
+  wishlist = JSON.parse(wishlist);
+
+  if (wishlist.includes(productId)) return true;
+
+  return false;
+};
+
 export {
   getWishlist,
   setWishlist,
   clearWishlist,
   removeFromWishlist,
   addToWishlist,
-  getWishlistQuantity
+  getWishlistQuantity,
+  wishlistProductExists
 };

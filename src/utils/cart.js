@@ -42,11 +42,16 @@ const clearCart = () => {
   localStorage.setItem('cart', []);
 };
 
-const removeFromCart = productId => {
+const removeFromCart = product => {
   const oldCart = JSON.parse(localStorage.getItem('cart'));
   if (!oldCart) return;
 
-  const productIndex = oldCart.findIndex(prod => prod.product === productId);
+  const productIndex = oldCart.findIndex(
+    prod =>
+      prod.product === product.id &&
+      prod.size === product.size &&
+      prod.color === product.color
+  );
   // If the product isn't in the cart
   if (productIndex === -1) return;
 
@@ -63,7 +68,7 @@ const removeFromCart = productId => {
   setCart(updatedCart);
 };
 
-const addToCart = (productId, options = {}) => {
+const addToCart = (productId, options = { size: 'md', color: 'default' }) => {
   let oldCart = localStorage.getItem('cart');
 
   if (!oldCart) {
@@ -73,7 +78,12 @@ const addToCart = (productId, options = {}) => {
     oldCart = JSON.parse(oldCart);
   }
 
-  const productIndex = oldCart.findIndex(prod => prod.product === productId);
+  const productIndex = oldCart.findIndex(
+    prod =>
+      prod.product === productId &&
+      prod.size === options.size &&
+      prod.color === options.color
+  );
   // If product isn't already in cart
   if (productIndex === -1)
     return setCart([
@@ -89,7 +99,7 @@ const addToCart = (productId, options = {}) => {
   const newCart = [...oldCart];
 
   options.quantity
-    ? (newCart[productIndex].quantity = options.quantity)
+    ? (newCart[productIndex].quantity += options.quantity)
     : newCart[productIndex].quantity++;
 
   options.size

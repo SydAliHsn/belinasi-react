@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -8,63 +8,48 @@ import belinasiApi from '../apis/belinasiApi';
 import Spinner from '../components/Spinner';
 import Preloader from '../components/Preloader';
 
-const categories = [
-  'disabled',
-  'education',
-  'orphanage',
-  'humanity',
-  'animals',
-  'community',
-  'religious',
-  'sports',
-  'lifestyle',
-  'business',
-  'family',
-  'environment',
-  'others',
-  'all'
-];
-
 const Shop = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const { query } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [productsStatus, setProductsStatus] = useState('loading');
   const [products, setProducts] = useState([]);
   const [currPage, setCurrPage] = useState(0);
   const [total, setTotal] = useState(null);
-  const [category, setCategory] = useState('all');
-  // using this For page rerender
-  const [pageStatus, setPageStatus] = useState('loaded');
-
-  useEffect(() => window.scrollTo(0, 0), []);
-
-  useEffect(() => {
-    getProducts();
-  }, [category]);
 
   // const createNotif = (type, text) => {
   //   searchParams.append(type, text);
   //   setSearchParams(searchParams);
   // };
 
-  const loadMore = async () => {
-    setCurrPage(currPage + 1);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setProducts([]);
+    setCurrPage(1);
+    getProducts(query);
+  }, [query]);
 
-    await getProducts();
-  };
+  useEffect(() => {
+    getProducts(query);
+  }, [currPage]);
 
-  const getProducts = async () => {
+  const getProducts = async q => {
     try {
       setProductsStatus('loading');
 
-      let url = `/products?page=${currPage + 1}&fields=images,name,type,price`;
-      if (category && category !== 'all') url += `&category=${category}`;
-
+      let url = `/products?page=${currPage}&fields=images,name,type,price&q=${q}`;
       const { data } = await belinasiApi.get(url);
 
-      setProducts([...products, ...data.data.products]);
+      if (currPage === 1) {
+        setProducts([...data.data.products]);
+      } else {
+        setProducts([...products, ...data.data.products]);
+      }
       setTotal(data.data.total);
-      setCurrPage(currPage + 1);
 
       setProductsStatus('loaded');
     } catch (err) {
@@ -73,27 +58,12 @@ const Shop = () => {
     }
   };
 
-  const renderCategories = () => {
-    return categories.map(categ => {
-      return (
-        <span
-          class={
-            'widget__tagcloud--link m-2 ' + (category === categ ? 'active' : '')
-          }
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            if (categ === category) return;
+  //   useEffect(getProducts, []);
 
-            setCurrPage(0);
-            setProducts([]);
-            setTotal(null);
-            setCategory(categ);
-          }}
-        >
-          {categ[0].toUpperCase() + categ.slice(1)}
-        </span>
-      );
-    });
+  const loadMore = async () => {
+    setCurrPage(currPage + 1);
+
+    // await getProducts(query);
   };
 
   const renderProducts = () => {
@@ -151,8 +121,6 @@ const Shop = () => {
 
   return (
     <React.Fragment>
-      <Preloader status={pageStatus} />
-
       <Header />
       <div
         className="container"
@@ -166,41 +134,12 @@ const Shop = () => {
           className="h2"
           style={{
             marginTop: '3rem',
-            marginBottom: '1.5rem',
+            marginBottom: '2rem',
             paddingLeft: '1rem'
           }}
         >
-          Categories
+          Results for "{query}"
         </h2>
-        <div
-          className="categories-container"
-          style={{
-            marginBottom: '8rem',
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}
-        >
-          {renderCategories()}
-          <p
-            onClick={() => {
-              setCurrPage(0);
-              setProducts([]);
-              setTotal(null);
-              setCategory('');
-              getProducts();
-            }}
-            className="reset"
-            style={{
-              fontSize: '2rem',
-              color: '#fff',
-              margin: '0 1.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            RESET
-          </p>
-        </div>
 
         {renderProducts()}
 
