@@ -57,7 +57,8 @@ const Shop = () => {
     try {
       setProductsStatus('loading');
 
-      let url = `/products?page=${currPage + 1}&fields=images,name,type,price`;
+      let url = `/products?page=${currPage +
+        1}&fields=images,name,type,price,designs,availableColors`;
       if (category && category !== 'all') url += `&category=${category}`;
 
       const { data } = await belinasiApi.get(url);

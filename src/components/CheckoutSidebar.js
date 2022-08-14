@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { renderProductImages } from '../utils/productUtils';
 
-import { getCart } from '../utils/cart';
+// import { getCart } from '../utils/cart';
 
 const CheckoutSidebar = ({ cartProducts, total }) => {
   const renderProducts = () => {
@@ -12,11 +13,9 @@ const CheckoutSidebar = ({ cartProducts, total }) => {
             <div class="product__image two  d-flex align-items-center">
               <div class="product__thumbnail border-radius-5">
                 <Link to={`/products/${product.id}`}>
-                  <img
-                    class="border-radius-5"
-                    src={product.images[0]}
-                    alt="cart-product"
-                  />
+                  <div class="border-radius-5">
+                    {renderProductImages(product, product.color)[0]}
+                  </div>
                 </Link>
                 <span class="product__thumbnail--quantity">
                   {product.quantity}
@@ -24,11 +23,18 @@ const CheckoutSidebar = ({ cartProducts, total }) => {
               </div>
               <div class="product__description">
                 <h3 class="product__description--name h4">
-                  <a href="product-details.html">{product.title}</a>
+                  <a href="product-details.html">
+                    {product.name} ({product.type})
+                  </a>
                 </h3>
-                <span class="product__description--variant">
-                  COLOR: {product.selectedColor}
-                </span>
+                <div class="product__description--variant">
+                  COLOR:
+                  {product.color.slice(0, 1).toUpperCase() +
+                    product.color.slice(1)}
+                </div>
+                <div class="product__description--variant">
+                  SIZE: {product.size.toUpperCase()}
+                </div>
               </div>
             </div>
           </td>

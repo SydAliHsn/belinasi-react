@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 import { getCart, clearCart, addToCart, removeFromCart } from '../utils/cart';
+import { renderProductImages } from '../utils/productUtils';
 
 const Cart = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [cartProducts, setCartProducts] = useState([]);
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,8 +35,25 @@ const Cart = () => {
             <div class="cart__product d-flex align-items-center">
               <button
                 class="cart__remove--btn"
-                aria-label="search button"
+                // aria-label="search button"
                 type="button"
+                onClick={async () => {
+                  const updatedCartProducts = [...cartProducts];
+                  updatedCartProducts[i].quantity--;
+                  setCartProducts(updatedCartProducts);
+
+                  while (product.quantity >= 0) {
+                    removeFromCart(product);
+                    product.quantity--;
+                  }
+
+                  const newCart = await getCart();
+                  setCartProducts(newCart);
+                  createNotif(
+                    'info',
+                    `${product.name} (${product.type}) removed from cart.`
+                  );
+                }}
               >
                 <svg
                   fill="currentColor"
@@ -42,11 +67,9 @@ const Cart = () => {
               </button>
               <div class="cart__thumbnail">
                 <Link to={`/products/${product.id}`}>
-                  <img
-                    class="border-radius-5"
-                    src={product.images[0]}
-                    alt="cart-product"
-                  />
+                  <div class="border-radius-5">
+                    {renderProductImages(product, product.color)[0]}
+                  </div>
                 </Link>
               </div>
               <div class="cart__content">

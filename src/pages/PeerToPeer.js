@@ -103,8 +103,12 @@ const PeerToPeer = () => {
         </section>
         {/* <!-- End pros section--> */}
 
+        {/* <!-- Start options section --> */}
+        <FundraiseOptions />
+        {/* <!-- End options section --> */}
+
         {/* <!-- Start ready banner --> */}
-        <section class="section--padding ready-section">
+        <section class="section--padding ready-section bg-secondary">
           <div class="container ready-section__container">
             <div class="ready-section__content">
               <h2 class="h2 h-slim text-half-width">
@@ -121,10 +125,6 @@ const PeerToPeer = () => {
           </div>
         </section>
         {/* <!-- End ready banner --> */}
-
-        {/* <!-- Start options section --> */}
-        <FundraiseOptions />
-        {/* <!-- End options section --> */}
 
         {/* <!-- Start shipping section --> */}
         <Shipping />

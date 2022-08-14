@@ -1,7 +1,38 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import { renderProductImages } from '../utils/productUtils';
 
 const CheckoutHeader = ({ products }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const toastOptions = {
+      position: 'top-center',
+      colored: true
+    };
+
+    const message = searchParams.get('message');
+    if (message) toast(message, toastOptions);
+
+    const success = searchParams.get('success');
+    if (success) toast.success(success, toastOptions);
+
+    const error = searchParams.get('error');
+    if (error) toast.error(error, toastOptions);
+
+    const info = searchParams.get('info');
+    if (info) toast.info(info, toastOptions);
+
+    searchParams.delete('message');
+    searchParams.delete('success');
+    searchParams.delete('info');
+    searchParams.delete('error');
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams]);
+
   const getTotal = () => {
     return products.reduce((amount, el) => {
       return amount + el.price * el.quantity;
@@ -15,13 +46,11 @@ const CheckoutHeader = ({ products }) => {
           <td class=" summary__table--list">
             <div class="cart__product d-flex align-items-center">
               <div class="product__thumbnail border-radius-5">
-                <a href="product-details.html">
-                  <img
-                    class="border-radius-5"
-                    src={product.images[0]}
-                    alt="cart-product"
-                  />
-                </a>
+                <Link to={`/products/${product.id}`}>
+                  <div class="border-radius-5">
+                    {renderProductImages(product, product.color)[0]}
+                  </div>
+                </Link>
                 <span class="product__thumbnail--quantity">
                   {product.quantity}
                 </span>
@@ -46,6 +75,8 @@ const CheckoutHeader = ({ products }) => {
 
   return (
     <header class="main__header checkout__mian--header mb-30">
+      <ToastContainer />
+
       <h1 class="main__logo--title">
         <Link class="main__logo--link" to="/">
           <img class="main__logo--img" src="" />

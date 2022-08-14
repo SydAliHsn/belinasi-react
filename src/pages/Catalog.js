@@ -25,11 +25,11 @@ const Catalog = () => {
             </Link>
           </div>
           <img
-            src="./assets/img/product/t-shirt.png"
+            src="../assets/img/product/t-shirt.png"
             className="catalog-banner__img catalog-banner__img-1"
           />
           <img
-            src="./assets/img/product/t-shirt2.png"
+            src="../assets/img/product/t-shirt2.png"
             className="catalog-banner__img catalog-banner__img-2"
           />
         </div>
@@ -47,7 +47,7 @@ const Catalog = () => {
               </Link>
             </div>
             <img
-              src="./assets/img/product/sweatshirt.png"
+              src="../assets/img/product/sweatshirt.png"
               className="catalog-banner-2__half-img"
             />
           </div>
@@ -59,7 +59,7 @@ const Catalog = () => {
               </Link>
             </div>
             <img
-              src="./assets/img/product/sleeve-shirt.png"
+              src="../assets/img/product/sleeve-shirt.png"
               className="catalog-banner-2__half-img"
             />
           </div>

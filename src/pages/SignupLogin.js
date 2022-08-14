@@ -22,7 +22,6 @@ const SignupLogin = () => {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupPasswordConfirm, setSignupPasswordConfirm] = useState('');
   const [signupName, setSignupName] = useState('');
-  const [signupRole, setSignupRole] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -76,17 +75,12 @@ const SignupLogin = () => {
         createNotif('error', 'Both passwords must be the same!');
         return setSignupStatus('error');
       }
-      if (!signupRole) {
-        createNotif('error', 'Please specify the role / type for the account.');
-        return setSignupStatus('error');
-      }
 
       const { data } = await belinasiApi.post('/users/signup', {
         email: signupEmail,
         password: signupPassword,
         passwordConfirm: signupPasswordConfirm,
-        name: signupName,
-        role: signupRole || 'customer'
+        name: signupName
       });
 
       localStorage.setItem('userId', data.data.user.id);
@@ -161,7 +155,6 @@ const SignupLogin = () => {
                         ) : (
                           <button
                             class="account__login--btn primary__btn"
-                            // onClick={login}
                             type="submit"
                           >
                             Login
@@ -171,7 +164,6 @@ const SignupLogin = () => {
                       <div class="account__login--divide">
                         <span class="account__login--divide__text">OR</span>
                       </div>
-                      <h3 class="account-login__contact-heading">Contact us</h3>
                       <div class="account__social d-flex justify-content-center mb-15">
                         <a
                           class="account__social--link facebook"
@@ -247,18 +239,6 @@ const SignupLogin = () => {
                           }
                           required
                         />
-                        <select
-                          class="account__login--input signup--role"
-                          value={signupRole}
-                          onChange={e => setSignupRole(e.target.value)}
-                        >
-                          <option value="" disabled>
-                            Role
-                          </option>
-                          <option value="customer">Customer</option>
-                          <option value="yayasan">Yayasan</option>
-                          <option value="public-figure">Public Figure</option>
-                        </select>
 
                         {signupStatus === 'loading' ? (
                           <div

@@ -8,12 +8,12 @@ var line3;
 var line4;
 $(document).ready(function() {
   //setup front side canvas
-  canvas = new fabric.Canvas('tcanvas', {
+  window.canvas = new fabric.Canvas('tcanvas', {
     hoverCursor: 'pointer',
     selection: true,
-    selectionBorderColor: 'blue'
+    selectionBorderColor: 'pink'
   });
-  canvas.on({
+  window.canvas.on({
     'object:moving': function(e) {
       e.target.opacity = 0.5;
     },
@@ -23,59 +23,61 @@ $(document).ready(function() {
     'object:selected': onObjectSelected,
     'selection:cleared': onSelectedCleared
   });
-  // piggyback on `canvas.findTarget`, to fire "object:over" and "object:out" events
-  canvas.findTarget = (function(originalFn) {
+
+  // piggyback on `window.canvas.findTarget`, to fire "object:over" and "object:out" events
+  window.canvas.findTarget = (function(originalFn) {
     return function() {
       var target = originalFn.apply(this, arguments);
       if (target) {
         if (this._hoveredTarget !== target) {
-          canvas.fire('object:over', { target: target });
+          window.canvas.fire('object:over', { target: target });
           if (this._hoveredTarget) {
-            canvas.fire('object:out', { target: this._hoveredTarget });
+            window.canvas.fire('object:out', { target: this._hoveredTarget });
           }
           this._hoveredTarget = target;
         }
       } else if (this._hoveredTarget) {
-        canvas.fire('object:out', { target: this._hoveredTarget });
+        window.canvas.fire('object:out', { target: this._hoveredTarget });
         this._hoveredTarget = null;
       }
       return target;
     };
-  })(canvas.findTarget);
+  })(window.canvas.findTarget);
 
-  canvas.on('object:over', function(e) {
+  window.canvas.on('object:over', function(e) {
     //e.target.setFill('red');
-    //canvas.renderAll();
+    //window.canvas.renderAll();
   });
 
-  canvas.on('object:out', function(e) {
+  window.canvas.on('object:out', function(e) {
     //e.target.setFill('green');
-    //canvas.renderAll();
+    //window.canvas.renderAll();
   });
 
-  document.getElementById('add-text').onclick = function() {
+  document.getElementById('add-text').onsubmit = function(e) {
+    e.preventDefault();
     var text = $('#text-string').val();
     var textSample = new fabric.Text(text, {
       left: fabric.util.getRandomInt(0, 100),
-      top: fabric.util.getRandomInt(0, 65),
-      fontFamily: 'helvetica',
+      top: fabric.util.getRandomInt(65, 265),
+      fontFamily: 'Comic Sans MS',
       angle: 0,
-      fill: '#000000',
-      scaleX: 0.5,
-      scaleY: 0.5,
+      fill: '#555555',
+      scaleX: 1.2,
+      scaleY: 1.2,
       fontWeight: '',
       hasRotatingPoint: true
     });
-    canvas.add(textSample);
-    canvas.item(canvas.item.length - 1).hasRotatingPoint = true;
+    window.canvas.add(textSample);
+    window.canvas.item(window.canvas.item.length - 1).hasRotatingPoint = true;
     $('#texteditor').css('display', 'block');
     $('#imageeditor').css('display', 'block');
   };
   $('#text-string').keyup(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.text = this.value;
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   // $(".img-polaroid").click(function (e) {
@@ -101,114 +103,114 @@ $(document).ready(function() {
   //       hasRotatingPoint: true,
   //     });
   //     //image.scale(getRandomNum(0.1, 0.25)).setCoords();
-  //     canvas.add(image);
+  //     window.canvas.add(image);
   //   });
   // });
   document.getElementById('remove-selected').onclick = function() {
-    var activeObject = canvas.getActiveObject(),
-      activeGroup = canvas.getActiveGroup();
+    var activeObject = window.canvas.getActiveObject(),
+      activeGroup = window.canvas.getActiveGroup();
     if (activeObject) {
-      canvas.remove(activeObject);
+      window.canvas.remove(activeObject);
       $('#text-string').val('');
     } else if (activeGroup) {
       var objectsInGroup = activeGroup.getObjects();
-      canvas.discardActiveGroup();
+      window.canvas.discardActiveGroup();
       objectsInGroup.forEach(function(object) {
-        canvas.remove(object);
+        window.canvas.remove(object);
       });
     }
   };
-  document.getElementById('bring-to-front').onclick = function() {
-    var activeObject = canvas.getActiveObject(),
-      activeGroup = canvas.getActiveGroup();
-    if (activeObject) {
-      activeObject.bringToFront();
-    } else if (activeGroup) {
-      var objectsInGroup = activeGroup.getObjects();
-      canvas.discardActiveGroup();
-      objectsInGroup.forEach(function(object) {
-        object.bringToFront();
-      });
-    }
-  };
-  document.getElementById('send-to-back').onclick = function() {
-    var activeObject = canvas.getActiveObject(),
-      activeGroup = canvas.getActiveGroup();
-    if (activeObject) {
-      activeObject.sendToBack();
-    } else if (activeGroup) {
-      var objectsInGroup = activeGroup.getObjects();
-      canvas.discardActiveGroup();
-      objectsInGroup.forEach(function(object) {
-        object.sendToBack();
-      });
-    }
-  };
+  // document.getElementById("bring-to-front").onclick = function () {
+  //   var activeObject = window.canvas.getActiveObject(),
+  //     activeGroup = window.canvas.getActiveGroup();
+  //   if (activeObject) {
+  //     activeObject.bringToFront();
+  //   } else if (activeGroup) {
+  //     var objectsInGroup = activeGroup.getObjects();
+  //     window.canvas.discardActiveGroup();
+  //     objectsInGroup.forEach(function (object) {
+  //       object.bringToFront();
+  //     });
+  //   }
+  // };
+  // document.getElementById("send-to-back").onclick = function () {
+  //   var activeObject = window.canvas.getActiveObject(),
+  //     activeGroup = window.canvas.getActiveGroup();
+  //   if (activeObject) {
+  //     activeObject.sendToBack();
+  //   } else if (activeGroup) {
+  //     var objectsInGroup = activeGroup.getObjects();
+  //     window.canvas.discardActiveGroup();
+  //     objectsInGroup.forEach(function (object) {
+  //       object.sendToBack();
+  //     });
+  //   }
+  // };
   $('#text-bold').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.fontWeight = activeObject.fontWeight == 'bold' ? '' : 'bold';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-italic').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.fontStyle =
         activeObject.fontStyle == 'italic' ? '' : 'italic';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-strike').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.textDecoration =
         activeObject.textDecoration == 'line-through' ? '' : 'line-through';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-underline').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.textDecoration =
         activeObject.textDecoration == 'underline' ? '' : 'underline';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-left').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.textAlign = 'left';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-center').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.textAlign = 'center';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-right').click(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.textAlign = 'right';
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#font-family').change(function() {
-    var activeObject = canvas.getActiveObject();
+    var activeObject = window.canvas.getActiveObject();
     if (activeObject && activeObject.type === 'text') {
       activeObject.fontFamily = this.value;
-      canvas.renderAll();
+      window.canvas.renderAll();
     }
   });
   $('#text-bgcolor').miniColors({
     change: function(hex, rgb) {
-      var activeObject = canvas.getActiveObject();
+      var activeObject = window.canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
         activeObject.backgroundColor = this.value;
-        canvas.renderAll();
+        window.canvas.renderAll();
       }
     },
     open: function(hex, rgb) {
@@ -220,10 +222,10 @@ $(document).ready(function() {
   });
   $('#text-fontcolor').miniColors({
     change: function(hex, rgb) {
-      var activeObject = canvas.getActiveObject();
+      var activeObject = window.canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
         activeObject.fill = this.value;
-        canvas.renderAll();
+        window.canvas.renderAll();
       }
     },
     open: function(hex, rgb) {
@@ -236,10 +238,10 @@ $(document).ready(function() {
 
   $('#text-strokecolor').miniColors({
     change: function(hex, rgb) {
-      var activeObject = canvas.getActiveObject();
+      var activeObject = window.canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
         activeObject.strokeStyle = this.value;
-        canvas.renderAll();
+        window.canvas.renderAll();
       }
     },
     open: function(hex, rgb) {
@@ -250,54 +252,55 @@ $(document).ready(function() {
     }
   });
 
-  //canvas.add(new fabric.fabric.Object({hasBorders:true,hasControls:false,hasRotatingPoint:false,selectable:false,type:'rect'}));
-  $('#drawingArea').hover(
-    function() {
-      canvas.add(line1);
-      canvas.add(line2);
-      canvas.add(line3);
-      canvas.add(line4);
-      canvas.renderAll();
-    },
-    function() {
-      canvas.remove(line1);
-      canvas.remove(line2);
-      canvas.remove(line3);
-      canvas.remove(line4);
-      canvas.renderAll();
-    }
-  );
+  //window.canvas.add(new fabric.fabric.Object({hasBorders:true,hasControls:false,hasRotatingPoint:false,selectable:false,type:'rect'}));
+  // $('#drawingArea').hover(
+  //   function() {
+  //     window.canvas.add(line1);
+  //     window.canvas.add(line2);
+  //     window.canvas.add(line3);
+  //     window.canvas.add(line4);
+  //     window.canvas.renderAll();
+  //   },
+  //   function() {
+  //     window.canvas.remove(line1);
+  //     window.canvas.remove(line2);
+  //     window.canvas.remove(line3);
+  //     window.canvas.remove(line4);
+  //     window.canvas.renderAll();
+  //   }
+  // );
 
   $('.color-preview').click(function() {
     var color = $(this).css('background-color');
     document.getElementById('shirtDiv').style.backgroundColor = color;
   });
 
-  $('#flip').click(function() {
-    if ($(this).attr('data-original-title') == 'Show Back View') {
-      $(this).attr('data-original-title', 'Show Front View');
-      $('#tshirtFacing').attr('src', '/img/crew_back.png');
-      a = JSON.stringify(canvas);
-      canvas.clear();
-      try {
-        var json = JSON.parse(b);
-        canvas.loadFromJSON(b);
-      } catch (e) {}
-    } else {
-      $(this).attr('data-original-title', 'Show Back View');
-      $('#tshirtFacing').attr('src', '/img/crew_front.png');
-      b = JSON.stringify(canvas);
-      canvas.clear();
-      try {
-        var json = JSON.parse(a);
-        canvas.loadFromJSON(a);
-      } catch (e) {}
-    }
-    canvas.renderAll();
-    setTimeout(function() {
-      canvas.calcOffset();
-    }, 200);
-  });
+  // $('#flip').click(function() {
+  //   if ($(this).attr('data-original-title') == 'Show Back View') {
+  //     $(this).attr('data-original-title', 'Show Front View');
+  //     $('#tshirtFacing').attr('src', '/new-designer-assets/img/crew_back.png');
+  //     a = JSON.stringify(window.canvas);
+  //     window.canvas.clear();
+  //     try {
+  //       var json = JSON.parse(b);
+  //       window.canvas.loadFromJSON(b);
+  //     } catch (e) {}
+  //   } else {
+  //     $(this).attr('data-original-title', 'Show Back View');
+  //     $('#tshirtFacing').attr('src', '/new-designer-assets/img/crew_front.png');
+  //     b = JSON.stringify(window.canvas);
+  //     window.canvas.clear();
+  //     try {
+  //       var json = JSON.parse(a);
+  //       window.canvas.loadFromJSON(a);
+  //     } catch (e) {}
+  //   }
+  //   window.canvas.renderAll();
+  //   setTimeout(function() {
+  //     window.canvas.calcOffset();
+  //   }, 200);
+  // });
+
   $('.clearfix button,a').tooltip();
   line1 = new fabric.Line([0, 0, 200, 0], {
     stroke: '#000000',
@@ -360,51 +363,50 @@ function onSelectedCleared(e) {
   $('#imageeditor').css('display', 'none');
 }
 function setFont(font) {
-  var activeObject = canvas.getActiveObject();
+  var activeObject = window.canvas.getActiveObject();
   if (activeObject && activeObject.type === 'text') {
     activeObject.fontFamily = font;
-    canvas.renderAll();
+    window.canvas.renderAll();
   }
 }
 function removeWhite() {
-  var activeObject = canvas.getActiveObject();
+  var activeObject = window.canvas.getActiveObject();
   if (activeObject && activeObject.type === 'image') {
     activeObject.filters[2] = new fabric.Image.filters.RemoveWhite({
       threshold: 100,
       distance: 10
     }); //0-255, 0-255
-    activeObject.applyFilters(canvas.renderAll.bind(canvas));
+    activeObject.applyFilters(window.canvas.renderAll.bind(window.canvas));
   }
 }
 
-const uploadBtn = document.querySelector('.btn-upload');
+// const uploadBtn = document.querySelector('.btn-upload');
 const fileToUpload = document.querySelector('#fileToUpload');
 const avatarlist = document.querySelector('#avatarlist');
 
-uploadBtn.addEventListener('click', async e => {
-  e.preventDefault();
+// uploadBtn.addEventListener('click', async e => {
+//   e.preventDefault();
 
-  const file = fileToUpload.files[0];
+//   const img = document.createElement('img');
 
-  if (!file) return;
+//   img.src = URL.createObjectURL(fileToUpload.files[0]);
 
-  const img = document.createElement('img');
+//   img.classList.add('img-polaroid');
+//   img.style = 'cursor: pointer;';
 
-  img.src = URL.createObjectURL(file);
-
-  img.classList.add('img-polaroid');
-  img.style = 'cursor: pointer;';
-
-  avatarlist.append(img);
-});
+//   avatarlist.append(img);
+// });
 
 avatarlist.addEventListener('click', e => {
   if (!e.target.classList.contains('img-polaroid')) return;
 
   var el = e.target;
+
   /*temp code*/
   var offset = 50;
-  var left = fabric.util.getRandomInt(0 + offset, 70 - offset);
+  // var left = fabric.util.getRandomInt(0 + offset, 200 - offset);
+  // var top = fabric.util.getRandomInt(0 + offset, 400 - offset);
+  var left = fabric.util.getRandomInt(0 + offset, 100 - offset);
   var top = fabric.util.getRandomInt(0 + offset, 200 - offset);
   var angle = fabric.util.getRandomInt(-20, 40);
   var width = fabric.util.getRandomInt(30, 50);
@@ -427,24 +429,8 @@ avatarlist.addEventListener('click', e => {
         hasRotatingPoint: true
       });
       //image.scale(getRandomNum(0.1, 0.25)).setCoords();
-      canvas.add(image);
+      window.canvas.add(image);
     },
     { crossOrigin: 'anonymous' }
-  );
-});
-
-const btnSave = document.querySelector('#btn-save');
-
-btnSave.addEventListener('click', e => {
-  let data = canvas.toDataURL({
-    format: 'png',
-    quality: 1
-  });
-
-  console.log(data);
-
-  btnSave.insertAdjacentHTML(
-    'afterend',
-    `<img class="design" src="${data}" style="border: 1px solid black; width: 15rem; height: 25rem;" />`
   );
 });

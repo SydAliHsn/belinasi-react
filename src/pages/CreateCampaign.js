@@ -7,16 +7,35 @@ import Breadcrumb from '../components/Breadcrumb';
 import Preloader from '../components/Preloader';
 import belinasiApi from '../apis/belinasiApi';
 
+const categories = [
+  'education',
+  'orphanage',
+  'disabled',
+  'community',
+  'humanity',
+  'animals',
+  'religious',
+  'sports',
+  'lifestyle',
+  'business',
+  'family',
+  'environment',
+  'others'
+];
+
 const CreateCampaign = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const imagesRef = React.createRef();
+  const videoRef = React.createRef();
 
   const [pageStatus, setPageStatus] = useState('loaded');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('education');
-  const [video, setVideo] = useState('');
-  const [images, setImages] = useState(['']);
+  const [images, setImages] = useState([]);
+  const [video, setVideo] = useState();
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split('T')[0]
   );
@@ -33,15 +52,13 @@ const CreateCampaign = () => {
     try {
       e.preventDefault();
 
-      if (
-        !title ||
-        !category ||
-        !video ||
-        !images[0] ||
-        !startDate ||
-        !endDate ||
-        !description
-      ) {
+      if (!images[0])
+        return createNotif(
+          'error',
+          'Please specify the images for the campaign as well.'
+        );
+
+      if (!title || !category || !startDate || !endDate || !description) {
         return createNotif('error', 'Please fill all the fields');
       }
 
@@ -49,33 +66,35 @@ const CreateCampaign = () => {
 
       const res = await belinasiApi.get('/users/getMe');
 
-      const campaignData = {
-        title,
-        category,
-        description,
-        images,
-        video,
-        startDate,
-        endDate,
-        creator: res.data.data.user.id
-      };
+      const formData = new FormData();
 
-      const { data } = await belinasiApi.post('/campaigns', campaignData);
+      // formData.append('images', images);
+      images.forEach(img => formData.append('images', img));
+      formData.append('title', title);
+      formData.append('category', category);
+      formData.append('description', description);
+      formData.append('video', video);
+      formData.append('startDate', startDate);
+      formData.append('endDate', endDate);
+
+      const { data } = await belinasiApi.post('/campaigns', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       navigate(
-        `/campaigns/${data.data.campaign.id}?success=${data.data.campaign.title} Campaign created successfully!`
+        `/campaigns/${data.data.campaign.id}?success=${data.data.campaign.title} Campaign created successfully!`,
+        { replace: 'true' }
       );
 
       setPageStatus('loaded');
     } catch (err) {
+      setPageStatus('loaded');
       if (err.response.data && err.response.status === 401) {
-        setPageStatus('loaded');
         return navigate(
-          `/signup-login?redirectTo=/createCampaign&error=${err.response.data.message}`
+          `/signup-login?redirectTo=/createCampaign&error=${err.response.data.message}`,
+          { replace: 'true' }
         );
       }
-
-      setPageStatus('loaded');
 
       if (err.response.data)
         return createNotif('error', err.response.data.message);
@@ -84,9 +103,17 @@ const CreateCampaign = () => {
     }
   };
 
+  const renderCategories = () => {
+    return categories.map(categ => (
+      <option value={categ}>
+        {categ.slice(0, 1).toUpperCase() + categ.slice(1)}
+      </option>
+    ));
+  };
+
   return (
     <React.Fragment>
-      <Preloader status={pageStatus} />
+      <Preloader status={pageStatus} loadingText="Creating Campaign..." />
 
       <Header />
       <Breadcrumb pageName={'Create Campaign'} />
@@ -116,11 +143,7 @@ const CreateCampaign = () => {
                   }}
                   value={category}
                 >
-                  <option value="education">Education</option>
-                  <option value="medical">Medical</option>
-                  <option value="adoption">Adoption</option>
-                  <option value="political">political</option>
-                  <option value="other">Other</option>
+                  {renderCategories()}
                 </select>
               </div>
             </div>
@@ -137,55 +160,49 @@ const CreateCampaign = () => {
               </div>
 
               <div>
-                <label>Images (URL): </label>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    gap: '1rem'
+                <label>Images (max 5): </label>
+                <input
+                  style={{ display: 'none' }}
+                  ref={imagesRef}
+                  type={'file'}
+                  accept="image/*"
+                  multiple
+                  required
+                  onChange={e => {
+                    setImages([...e.target.files]);
                   }}
+                />
+                <a
+                  className="primary__btn"
+                  onClick={() => imagesRef.current.click()}
                 >
-                  {images.map((img, i) => (
-                    <input
-                      type="text"
-                      value={img}
-                      onChange={e => {
-                        const newImgs = [...images];
-                        newImgs[i] = e.target.value;
-                        setImages(newImgs);
-                      }}
-                    />
-                  ))}
+                  Choose Images
+                </a>
 
-                  <a
-                    className="primary__btn"
-                    style={{ width: '90%', textAlign: 'center' }}
-                    onClick={e => {
-                      e.preventDefault();
-                      const newImgs = [...images];
-                      newImgs.push('');
-
-                      newImgs[newImgs.length - 2]
-                        ? setImages(newImgs)
-                        : createNotif('error', 'Please give a valid URL!');
-                    }}
-                  >
-                    Add More+
-                  </a>
-                </div>
+                <p>{images.length} images selected.</p>
               </div>
             </div>
 
             <div className="create-campaign-form__section">
               <div>
-                <label>Video (URL): </label>
+                <label>Video (max size 200MB): </label>
                 <input
-                  type="text"
-                  name="video"
-                  value={video}
-                  onChange={e => setVideo(e.target.value)}
+                  style={{ display: 'none' }}
+                  ref={videoRef}
+                  type={'file'}
+                  accept="video/mp4,video/x-m4v,video/*"
+                  onChange={e => {
+                    setVideo(e.target.files[0]);
+                  }}
                 />
+                <a
+                  className="primary__btn"
+                  onClick={() => videoRef.current.click()}
+                >
+                  Choose Video
+                </a>
+
+                <p>{video ? video.name : 'No video'} selected.</p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'row' }}>

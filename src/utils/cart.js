@@ -16,20 +16,25 @@ const getCartQuantity = () => {
 };
 
 const getCart = async () => {
-  let cart = localStorage.getItem('cart');
-  if (!cart) return [];
+  try {
+    let cart = localStorage.getItem('cart');
+    if (!cart) return [];
 
-  cart = JSON.parse(cart);
+    cart = JSON.parse(cart);
 
-  const cartHydrated = await Promise.all(
-    cart.map(async ({ product, quantity, color, size }) => {
-      const { data } = await belinasiApi.get(`/products/${product}`);
+    const cartHydrated = await Promise.all(
+      cart.map(async ({ product, quantity, color, size }) => {
+        const { data } = await belinasiApi.get(`/products/${product}`);
 
-      return { ...data.data.product, quantity, color, size };
-    })
-  );
+        return { ...data.data.product, quantity, color, size };
+      })
+    );
 
-  return cartHydrated;
+    return cartHydrated;
+  } catch (err) {
+    localStorage.setItem('cart', JSON.stringify([]));
+    return [];
+  }
 };
 
 const setCart = newCart => {

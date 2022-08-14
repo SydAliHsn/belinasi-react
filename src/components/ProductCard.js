@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { addToCart } from '../utils/cart';
+import { renderProductImages } from '../utils/productUtils';
 import {
   addToWishlist,
   removeFromWishlist,
@@ -16,10 +17,22 @@ const ProductCard = ({ product }) => {
     setSearchParams(searchParams);
   };
 
+  const images = product.designs ? renderProductImages(product) : null;
+
   return (
     <div class="product__items" product-id={product.id}>
       <div class="product__items--thumbnail">
-        <Link to={`/products/${product.id}`} class="product__items--link">
+        {!images ? null : (
+          <Link to={`/products/${product.id}`} class="product__items--link">
+            <div class="product__items--img product__primary--img">
+              {images[0]}
+            </div>
+            <div class="product__items--img product__secondary--img">
+              {images[1]}
+            </div>
+          </Link>
+        )}
+        {/* <Link to={`/products/${product.id}`} class="product__items--link">
           <img
             class="product__items--img product__primary--img"
             src={product.images[0]}
@@ -36,17 +49,17 @@ const ProductCard = ({ product }) => {
           ) : (
             ''
           )}
-        </Link>
+        </Link> */}
         <div class="product__badge">
           <span class="product__badge--items sale">Sale</span>
         </div>
       </div>
       <div class="product__items--content">
-        {/* <span class="product__items--content__subtitle">Jacket, Women</span> */}
-        <span class="product__items--content__subtitle">{product.type}</span>
+        <span class="product__items--content__subtitle">
+          {product.type.slice(0, 1).toUpperCase() + product.type.slice(1)}
+        </span>
 
         <h4 class="product__items--content__title">
-          {/* <a href="product-details.html">Western denim shirt</a> */}
           <Link to={`/products/${product.id}`} href="product-details.html">
             {product.name}
           </Link>
@@ -64,7 +77,10 @@ const ProductCard = ({ product }) => {
             <a
               class="product__items--action__btn add__to--cart"
               onClick={() => {
-                addToCart(product.id);
+                addToCart(product.id, {
+                  color: product.availableColors[0],
+                  size: 'md'
+                });
 
                 createNotif(
                   'success',

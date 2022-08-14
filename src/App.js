@@ -19,7 +19,6 @@ import Contact from './pages/Contact';
 import Cause from './pages/Cause';
 import Designer from './pages/Designer';
 import SignupLogin from './pages/SignupLogin';
-// import Dashboard from './pages/Dashboard';
 import Shop from './pages/Shop';
 import Wishlist from './pages/Wishlist';
 import Checkout1 from './pages/Checkout1';
@@ -44,7 +43,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/cause" element={<Cause />} />
         <Route path="/signup-login" element={<SignupLogin />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/about" element={<About />} />

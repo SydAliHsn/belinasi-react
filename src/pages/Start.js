@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
 import belinasiApi from '../apis/belinasiApi';
 import Header from '../components/Header';
@@ -25,8 +25,16 @@ const categories = [
 ];
 
 const Start = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const userId = localStorage.getItem('userId');
+    if (!userId)
+      navigate(
+        '/signup-login?error=You are not logged in. Please log in or signup to get access!&redirectTo=/start'
+      );
   }, []);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -116,8 +124,8 @@ const Start = () => {
       return (
         <div class="product__items my-1" key={campaign.id}>
           <div class="product__items--thumbnail">
-            <Link
-              to={`/campaigns/${campaign.id}/createProduct`}
+            <a
+              href={`/campaigns/${campaign.id}/createProduct`}
               class="product__items--link"
             >
               <img
@@ -135,7 +143,7 @@ const Start = () => {
               ) : (
                 ''
               )}
-            </Link>
+            </a>
           </div>
           <div class="product__items--content">
             <span class="product__items--content__subtitle">
@@ -144,9 +152,9 @@ const Start = () => {
             </span>
 
             <h3 class="product__items--content__title">
-              <Link to={`/campaigns/${campaign.id}/createProduct`}>
+              <a href={`/campaigns/${campaign.id}/createProduct`}>
                 {campaign.title}
-              </Link>
+              </a>
             </h3>
           </div>
         </div>

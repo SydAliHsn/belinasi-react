@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import ReactPlayer from 'react-player';
+import ReactPlayer from 'react-player/lazy';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, Thumbs } from 'swiper';
 import 'swiper/swiper-bundle.css';
@@ -29,8 +29,7 @@ const CampaignDetails = () => {
     try {
       setProductsStatus('loading');
 
-      let url = `/products?campaign=${campaignId}&page=${currPage +
-        1}&fields=images,name,type,price`;
+      let url = `/products?campaign=${campaignId}&page=${currPage + 1}`;
 
       const { data } = await belinasiApi.get(url);
 

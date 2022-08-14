@@ -14,24 +14,29 @@ const getWishlistQuantity = () => {
 };
 
 const getWishlist = async () => {
-  let wishlist = localStorage.getItem('wishlist');
+  try {
+    let wishlist = localStorage.getItem('wishlist');
 
-  if (!wishlist) {
+    if (!wishlist) {
+      localStorage.setItem('wishlist', JSON.stringify([]));
+      return [];
+    } else {
+      wishlist = JSON.parse(wishlist);
+    }
+
+    const wishlistHydrated = await Promise.all(
+      wishlist.map(async prod => {
+        const { data } = await belinasiApi.get(`/products/${prod}`);
+
+        return { ...data.data.product };
+      })
+    );
+
+    return wishlistHydrated;
+  } catch (err) {
     localStorage.setItem('wishlist', JSON.stringify([]));
     return [];
-  } else {
-    wishlist = JSON.parse(wishlist);
   }
-
-  const wishlistHydrated = await Promise.all(
-    wishlist.map(async prod => {
-      const { data } = await belinasiApi.get(`/products/${prod}`);
-
-      return { ...data.data.product };
-    })
-  );
-
-  return wishlistHydrated;
 };
 
 const setWishlist = newWishlist => {

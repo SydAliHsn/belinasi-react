@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useSearchParams
+} from 'react-router-dom';
 
 import belinasiApi from '../apis/belinasiApi';
 import CheckoutSidebar from '../components/CheckoutSidebar';
 import Preloader from '../components/Preloader';
+import { renderProductImages } from '../utils/productUtils';
 import { setCart } from '../utils/cart';
 
 const Checkout2 = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { orderId } = useParams();
   const navigate = useNavigate();
 
@@ -14,11 +21,16 @@ const Checkout2 = () => {
   const [orderProducts, setOrderProducts] = useState([]);
   const [pageStatus, setPageStatus] = useState('loading');
 
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
+
   const getProducts = async op => {
     try {
       const productsHydrated = await Promise.all(
         op.items.map(async ({ product, quantity, color, size }) => {
-          const { data } = await belinasiApi.get(`/products/${product}`);
+          const { data } = await belinasiApi.get(`/products/${product.id}`);
 
           return { ...data.data.product, quantity, color, size };
         })
@@ -27,6 +39,16 @@ const Checkout2 = () => {
       setOrderProducts(productsHydrated);
     } catch (err) {
       console.log(err);
+
+      if (err.response.status === 401) {
+        return navigate(
+          '/signup-login?error=You are not logged in! Please log in to get access.'
+        );
+      }
+
+      if (err.response.data) {
+        createNotif('error', err.response.data.message);
+      }
     }
   };
 
@@ -49,6 +71,7 @@ const Checkout2 = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getOrder();
   }, []);
 
@@ -68,10 +91,41 @@ const Checkout2 = () => {
 
       setPageStatus('loaded');
     } catch (err) {
-      if (!err.response) return alert('An error occured!');
+      if (!err.response) return createNotif('error', 'An error occured!');
 
-      err.response.data.message && alert(err.response.data.message);
+      err.response.data.message &&
+        createNotif('error', err.response.data.message);
     }
+  };
+
+  const renderSummaryProducts = () => {
+    return order.items.map(item => (
+      <tr class="summary__table--items">
+        <td class="summary__table--list">
+          <div class="cart__product d-flex align-items-center">
+            <div class="product__thumbnail border-radius-5">
+              <Link to={`/products/${item.product.id}`}>
+                {renderProductImages(item.product, item.product.color)[0]}
+              </Link>
+              <span class="product__thumbnail--quantity">{item.quantity}</span>
+            </div>
+            <div class="product__description">
+              <h3 class="product__description--name h4">
+                <Link to={`/products/${item.product.id}`}>
+                  {item.product.name}
+                </Link>
+              </h3>
+              <span class="product__description--variant">
+                COLOR: {item.product.color}
+              </span>
+            </div>
+          </div>
+        </td>
+        <td class="summary__table--list">
+          <span class="cart__price">{item.product.price * item.quantity}</span>
+        </td>
+      </tr>
+    ));
   };
 
   if (!order) return <Preloader status={pageStatus} />;
@@ -118,106 +172,16 @@ const Checkout2 = () => {
                           <path d="M.504 1.813l4.358 3.845.496.438.496-.438 4.642-4.096L9.504.438 4.862 4.534h.992L1.496.69.504 1.812z"></path>
                         </svg>
                       </span>
-                      <span class="order__summary--final__price">$227.70</span>
+                      <span class="order__summary--final__price">
+                        {order.total} Rp
+                      </span>
                     </span>
                   </summary>
                   <div class="order__summary--section">
                     <div class="cart__table checkout__product--table">
                       <table class="summary__table">
                         <tbody class="summary__table--body">
-                          <tr class="summary__table--items">
-                            <td class="summary__table--list">
-                              <div class="product__image two d-flex align-items-center">
-                                <div class="product__thumbnail border-radius-5">
-                                  <a href="product-details.html">
-                                    <img
-                                      class="border-radius-5"
-                                      src="assets/img/product/small-product7.png"
-                                      alt="cart-product"
-                                    />
-                                  </a>
-                                  <span class="product__thumbnail--quantity">
-                                    1
-                                  </span>
-                                </div>
-                                <div class="product__description">
-                                  <h3 class="product__description--name h4">
-                                    <a href="product-details.html">
-                                      Fresh-whole-fish
-                                    </a>
-                                  </h3>
-                                  <span class="product__description--variant">
-                                    COLOR: Blue
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td class="summary__table--list">
-                              <span class="cart__price">£65.00</span>
-                            </td>
-                          </tr>
-                          <tr class="summary__table--items">
-                            <td class="summary__table--list">
-                              <div class="cart__product d-flex align-items-center">
-                                <div class="product__thumbnail border-radius-5">
-                                  <a href="product-details.html">
-                                    <img
-                                      class="border-radius-5"
-                                      src="assets/img/product/small-product2.png"
-                                      alt="cart-product"
-                                    />
-                                  </a>
-                                  <span class="product__thumbnail--quantity">
-                                    1
-                                  </span>
-                                </div>
-                                <div class="product__description">
-                                  <h3 class="product__description--name h4">
-                                    <a href="product-details.html">
-                                      Vegetable-healthy
-                                    </a>
-                                  </h3>
-                                  <span class="product__description--variant">
-                                    COLOR: Green
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td class="summary__table--list">
-                              <span class="cart__price">£82.00</span>
-                            </td>
-                          </tr>
-                          <tr class="summary__table--items">
-                            <td class="summary__table--list">
-                              <div class="cart__product d-flex align-items-center">
-                                <div class="product__thumbnail border-radius-5">
-                                  <a href="product-details.html">
-                                    <img
-                                      class="border-radius-5"
-                                      src="assets/img/product/small-product4.png"
-                                      alt="cart-product"
-                                    />
-                                  </a>
-                                  <span class="product__thumbnail--quantity">
-                                    1
-                                  </span>
-                                </div>
-                                <div class="product__description">
-                                  <h3 class="product__description--name h4">
-                                    <a href="product-details.html">
-                                      Raw-onions-surface
-                                    </a>
-                                  </h3>
-                                  <span class="product__description--variant">
-                                    COLOR: White
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td class="summary__table--list">
-                              <span class="cart__price">£78.00</span>
-                            </td>
-                          </tr>
+                          {renderSummaryProducts()}
                         </tbody>
                       </table>
                     </div>
@@ -264,7 +228,7 @@ const Checkout2 = () => {
                               Total
                             </td>
                             <td class="checkout__total--footer__amount checkout__total--footer__list text-right">
-                              $860.00
+                              {order.total} Rp
                             </td>
                           </tr>
                         </tfoot>

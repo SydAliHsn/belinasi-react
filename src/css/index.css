@@ -1604,6 +1604,9 @@ select {
 .text__secondary {
   color: var(--secondary-color);
 }
+.text__fade {
+  color: var(--text-dark-gray-color);
+}
 .text__secondary2 {
   color: var(--secondary-color);
 }
@@ -9507,10 +9510,12 @@ input.quickview__value--number {
   font-size: 1.3rem;
 }
 .breadcrumb__text.current {
-  color: var(----text-dark-color);
+  color: var(--text-dark-color);
 }
 .order__summary--mobile__version {
+  margin-top: 1rem;
   display: none;
+  background-color: var(--bg-color);
 }
 @media only screen and (max-width: 767px) {
   .order__summary--mobile__version {
@@ -9520,7 +9525,7 @@ input.quickview__value--number {
 .order__summary--toggle {
   width: 100%;
   text-align: left;
-  background: var(--bg-gray-color);
+  /* background: var(--bg-gray-color); */
   border: 0;
   border: 1px solid var(--border-color2);
   padding: 1.2rem;
@@ -9568,7 +9573,6 @@ details > summary::-webkit-details-marker {
   font-weight: 600;
 }
 .order__summary--section {
-  background: var(--bg-gray-color);
   padding: 3rem 1rem 1rem;
 }
 .checkout__checkbox {
@@ -11738,16 +11742,18 @@ details > summary::-webkit-details-marker {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 100%;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
   position: fixed;
   left: 0;
   top: 0;
+  height: 100%;
   width: 100%;
   z-index: 9999;
-  pointer-events: none;
+
+  /* done this programmatically in Preloader.js */
+  /* pointer-events: none; */
 }
 .ctn-preloader .animation-preloader {
   position: absolute;
@@ -12001,11 +12007,12 @@ details > summary::-webkit-details-marker {
   --toastify-color-success: var(--secondary-color) !important;
   --toastify-color-error: #ff0000 !important;
   --toastify-color-info: var(--yellow-color) !important;
+  --toastify-font-family: var(--font-jost) I !important;
 }
 
 @media (min-width: 768px) {
   .Toastify__toast-container {
-    font-size: 2rem !important;
+    font-size: 2.2rem !important;
     width: 50rem !important;
   }
 }
@@ -12016,7 +12023,7 @@ details > summary::-webkit-details-marker {
 }
 .campaign-details__video-wrapper {
   /* width: 100%; */
-  aspect-ratio: 16 / 9;
+  /* aspect-ratio: 16 / 10; */
 }
 .campaign-details__img-vid-container {
   display: flex;

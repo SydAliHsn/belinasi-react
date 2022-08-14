@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import belinasiApi from '../apis/belinasiApi';
 import CheckoutHeader from '../components/CheckoutHeader';
 
@@ -9,6 +9,7 @@ import { getCart } from '../utils/cart';
 
 const Checkout1 = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [pageStatus, setPageStatus] = useState('loading');
   const [cartProducts, setCartProducts] = useState([]);
@@ -25,6 +26,13 @@ const Checkout1 = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      navigate(
+        '/signup-login?error=You are not logged in. Please log in to get access!&redirectTo=/checkout'
+      );
+    }
+
     (async function() {
       const cart = await getCart();
       setCartProducts(cart);
@@ -34,6 +42,11 @@ const Checkout1 = () => {
       setPageStatus('loaded');
     })();
   }, []);
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
 
   const createOrderAndContinue = async () => {
     try {
@@ -52,7 +65,15 @@ const Checkout1 = () => {
       navigate(`/checkout/${data.data.order.id}`);
     } catch (err) {
       console.log(err);
-      alert(err.response.data.message);
+
+      if (err.response.status === 401) {
+        setPageStatus('loaded');
+        return navigate(
+          '/signup-login?error=You are not logged in. Please log in to get access!'
+        );
+      }
+
+      createNotif('error', err.response.data.message);
 
       setPageStatus('loaded');
     }
@@ -71,7 +92,12 @@ const Checkout1 = () => {
               <CheckoutHeader products={cartProducts} />
 
               <main className="main__content_wrapper">
-                <form action="#">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    createOrderAndContinue();
+                  }}
+                >
                   <div className="checkout__content--step section__contact--information">
                     <div className="section__header checkout__section--header d-flex align-items-center justify-content-between mb-25">
                       <h2
@@ -85,6 +111,7 @@ const Checkout1 = () => {
                       <div className="checkout__email--phone mb-12">
                         <label>
                           <input
+                            required
                             className="checkout__input--field border-radius-5"
                             placeholder="Email or mobile phone mumber"
                             value={contactInfo}
@@ -105,6 +132,7 @@ const Checkout1 = () => {
                           <div className="checkout__input--list ">
                             <label>
                               <input
+                                required
                                 className="checkout__input--field border-radius-5"
                                 placeholder="First name"
                                 value={userData.firstName}
@@ -123,6 +151,7 @@ const Checkout1 = () => {
                           <div className="checkout__input--list">
                             <label>
                               <input
+                                required
                                 className="checkout__input--field border-radius-5"
                                 placeholder="Last name"
                                 value={userData.lastName}
@@ -142,6 +171,7 @@ const Checkout1 = () => {
                           <div className="checkout__input--list">
                             <label>
                               <input
+                                required
                                 className="checkout__input--field border-radius-5"
                                 placeholder="AddressComplete"
                                 value={userData.addressComplete}
@@ -160,6 +190,7 @@ const Checkout1 = () => {
                           <div className="checkout__input--list">
                             <label>
                               <input
+                                required
                                 className="checkout__input--field border-radius-5"
                                 placeholder="Apartment, suite, etc. (optional)"
                                 type="text"
@@ -209,6 +240,7 @@ const Checkout1 = () => {
                           <div className="checkout__input--list">
                             <label>
                               <input
+                                required
                                 className="checkout__input--field border-radius-5"
                                 placeholder="Postal code"
                                 value={userData.postalCode}
@@ -225,7 +257,7 @@ const Checkout1 = () => {
                         </div>
                       </div>
                       {/* <div className="checkout__checkbox">
-                        <input
+                        <input required
                           className="checkout__checkbox--input"
                           id="check2"
                           type="checkbox"
@@ -238,13 +270,14 @@ const Checkout1 = () => {
                     </div>
                   </div>
                   <div className="checkout__content--step__footer d-flex align-items-center">
-                    <a
+                    <button
                       className="continue__shipping--btn primary__btn border-radius-5"
+                      type="submit"
                       // to="checkout-2.html"
-                      onClick={createOrderAndContinue}
+                      // onClick={createOrderAndContinue}
                     >
                       Continue
-                    </a>
+                    </button>
                     <Link className="previous__link--content" to="/cart">
                       Return to cart
                     </Link>

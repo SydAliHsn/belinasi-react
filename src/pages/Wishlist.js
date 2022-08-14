@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { addToCart } from '../utils/cart';
-import { removeFromWishlist, getWishlist } from '../utils/wishlist';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Shipping from '../components/Shipping';
 import Breadcrumb from '../components/Breadcrumb';
 import Preloader from '../components/Preloader';
+import { removeFromWishlist, getWishlist } from '../utils/wishlist';
+import { addToCart } from '../utils/cart';
+import { renderProductImages } from '../utils/productUtils';
 
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState([]);
@@ -20,6 +21,8 @@ const Wishlist = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     (async function() {
       const wishlist = await getWishlist();
       setWishlistProducts(wishlist);
@@ -43,6 +46,11 @@ const Wishlist = () => {
                   let updatedWishlist = [...wishlistProducts];
                   updatedWishlist.splice(i, 1);
                   setWishlistProducts(updatedWishlist);
+
+                  createNotif(
+                    'info',
+                    `${prod.name} (${prod.type}) removed from wishlist.`
+                  );
                 }}
               >
                 <svg
@@ -56,17 +64,15 @@ const Wishlist = () => {
                 </svg>
               </button>
               <div class="cart__thumbnail">
-                <a href="product-details.html">
-                  <img
-                    class="border-radius-5"
-                    src={prod.images[0]}
-                    alt="cart-product"
-                  />
-                </a>
+                <Link to={`/products/${prod.id}`}>
+                  <div className="border-radius-5">
+                    {renderProductImages(prod)[0]}
+                  </div>
+                </Link>
               </div>
               <div class="cart__content">
                 <h4 class="cart__content--title">
-                  <a href="product-details.html">{prod.name}</a>
+                  <Link to={`/products/${prod.id}`}>{prod.name}</Link>
                 </h4>
                 <span class="cart__content--variant">
                   CAMPAIGN: {prod.campaign.title}
@@ -79,13 +85,26 @@ const Wishlist = () => {
             <span class="cart__price">{prod.price} Rp</span>
           </td>
           <td class="cart__table--body__list text-center">
-            <span class="in__stock text__secondary">in stock</span>
+            {prod.active ? (
+              <span class="in__stock text__secondary">Active</span>
+            ) : (
+              <span class="in__stock text__fade">Inactive</span>
+            )}
           </td>
           <td class="cart__table--body__list text-right">
             <button
               class="wishlist__cart--btn primary__btn"
               onClick={() => {
-                addToCart(prod.id);
+                if (!prod.active)
+                  return createNotif(
+                    'error',
+                    `${prod.name} (${prod.type}) is inactive, you cannot purchase it!`
+                  );
+
+                addToCart(prod.id, {
+                  size: 'md',
+                  color: prod.availableColors[0]
+                });
 
                 searchParams.append('minicart', true);
                 createNotif(
@@ -128,7 +147,7 @@ const Wishlist = () => {
                         <th class="cart__table--header__list">Product</th>
                         <th class="cart__table--header__list">Price</th>
                         <th class="cart__table--header__list text-center">
-                          STOCK STATUS
+                          STATUS
                         </th>
                         <th class="cart__table--header__list text-right">
                           ADD TO CART

@@ -11,6 +11,7 @@ import Preloader from '../components/Preloader';
 import ProductCard from '../components/ProductCard';
 import Shipping from '../components/Shipping';
 import { addToCart } from '../utils/cart';
+import { renderProductImages } from '../utils/productUtils';
 import { addToWishlist } from '../utils/wishlist';
 
 import paymentImage from '../assets/img/other/safe-checkout.png';
@@ -58,10 +59,17 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
+    setPageStatus('loading');
+
     window.scrollTo(0, 0);
 
-    if (!product) getProduct();
-  }, []);
+    getProduct();
+  }, [productId]);
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
 
   const renderRecommendProducts = () => {
     return recommendedProducts.map(product => {
@@ -76,35 +84,23 @@ const ProductDetails = () => {
   const renderSlides = () => {
     if (!product) return null;
 
-    return product.images.map(img => {
-      return (
-        <SwiperSlide className="swiper-slide">
-          <div className="product__media--preview__items">
-            <img
-              className="product__media--preview__items--img"
-              src={img}
-              alt="product-media-img"
-            />
-          </div>
-        </SwiperSlide>
-      );
-    });
+    return renderProductImages(
+      product,
+      currColor || product.availableColors[0]
+    ).map(img => <SwiperSlide className="swiper-slide">{img}</SwiperSlide>);
   };
 
   const renderThumbs = () => {
     if (!product) return null;
 
-    return product.images.map(img => {
-      return (
-        <SwiperSlide>
-          <img
-            className="product__media--nav__items--img"
-            src={img}
-            alt="product-nav-img"
-          />
-        </SwiperSlide>
-      );
-    });
+    return renderProductImages(
+      product,
+      currColor || product.availableColors[0]
+    ).map(img => (
+      <SwiperSlide className="product__media--nav__items--img">
+        {img}
+      </SwiperSlide>
+    ));
   };
 
   const renderSizes = () => {
@@ -265,11 +261,10 @@ const ProductDetails = () => {
 
                               addToCart(product.id, options);
 
-                              searchParams.set(
+                              createNotif(
                                 'success',
                                 `${product.name} (${product.type}) added to cart.`
                               );
-                              setSearchParams(searchParams);
                             }}
                           >
                             Add To Cart
@@ -279,7 +274,14 @@ const ProductDetails = () => {
                           <a
                             className="variant__wishlist--icon mb-15"
                             title="Add to wishlist"
-                            onClick={addToWishlist}
+                            onClick={() => {
+                              addToWishlist(product.id);
+
+                              createNotif(
+                                'success',
+                                `${product.name} (${product.type}) added to wishlist.`
+                              );
+                            }}
                           >
                             <svg
                               className="quickview__variant--wishlist__svg"
@@ -436,7 +438,7 @@ const ProductDetails = () => {
               </h2>
             </div>
 
-            <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n30">
+            <div className="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n30">
               {renderRecommendProducts()}
             </div>
           </div>

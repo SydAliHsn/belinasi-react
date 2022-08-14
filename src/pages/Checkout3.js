@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 
 import Preloader from '../components/Preloader';
 import belinasiApi from '../apis/belinasiApi';
 
 const Checkout3 = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [order, setOrder] = useState(null);
   const [pageStatus, setPageStatus] = useState('loading');
+
+  const createNotif = (type, text) => {
+    searchParams.append(type, text);
+    setSearchParams(searchParams);
+  };
 
   const getOrder = async () => {
     try {
@@ -20,14 +26,18 @@ const Checkout3 = () => {
 
       setPageStatus('loaded');
     } catch (err) {
+      console.log(err);
       if (!err.response) {
-        return alert(err.response.data.message);
+        return createNotif('error', err.response.data.message);
       }
 
       if (err.response.status === 401) {
-        return navigate('/signup-login?redirectTo=/myAccount', {
-          replace: true
-        });
+        return navigate(
+          '/signup-login?redirectTo=/myAccount&error=You are not logged in! Please log in to get access.',
+          {
+            replace: true
+          }
+        );
       }
 
       navigate('/');

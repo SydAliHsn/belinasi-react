@@ -7,6 +7,7 @@ import Spinner from './Spinner';
 
 import { getCart, getCartQuantity, removeFromCart } from '../utils/cart';
 import { getWishlistQuantity } from '../utils/wishlist';
+import { renderProductImages } from '../utils/productUtils';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Header = () => {
 
   setInterval(() => {
     window.scrollY > 100 ? setHeaderSticky(true) : setHeaderSticky(false);
-  }, 100);
+  }, 150);
 
   useEffect(() => {
     localStorage.getItem('userId') ? setLoggedIn(true) : setLoggedIn(false);
@@ -139,7 +140,7 @@ const Header = () => {
         <div class="minicart__product--items d-flex" productId={product.id}>
           <div class="minicart__thumb">
             <Link to={`/products/${product.id}`}>
-              <img src={product.images[0]} alt="product-img" />
+              {renderProductImages(product)[0]}
             </Link>
           </div>
           <div class="minicart__text">
@@ -579,26 +580,8 @@ const Header = () => {
               </div>
               <div class="header__account header__sticky--none">
                 <ul class="d-flex">
-                  {!loggedIn ? (
-                    <li class="header__account--items">
-                      <Link
-                        to={'/signup-login'}
-                        className="primary__btn"
-                        style={{
-                          paddingLeft: '1rem',
-                          paddingRight: '1rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Signup / Login
-                      </Link>
-                    </li>
-                  ) : (
-                    ''
-                  )}
-
                   {loggedIn ? (
-                    <li class="header__account--items d-none d-lg-block">
+                    <li class="header__account--items">
                       <Link class="header__account--btn" to="/myAccount">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -628,8 +611,25 @@ const Header = () => {
                       </Link>
                     </li>
                   ) : (
-                    ''
+                    <li class="header__account--items">
+                      <Link
+                        to={'/signup-login'}
+                        className="primary__btn"
+                        style={{
+                          paddingLeft: '1rem',
+                          paddingRight: '1rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Signup / Login
+                      </Link>
+                    </li>
                   )}
+                  {/* {loggedIn ? (
+                    
+                  ) : (
+                    ''
+                  )} */}
                   <li class="header__account--items d-none d-lg-block">
                     <Link class="header__account--btn" to="/wishlist">
                       <svg
@@ -939,7 +939,7 @@ const Header = () => {
                       )}
                     </Link>
                   </li>
-                  <li class="header__account--items header__account2--items">
+                  <li class="header__account--items header__account2--items d-none d-lg-block">
                     <a
                       class="header__account--btn minicart__open--btn"
                       data-offcanvas

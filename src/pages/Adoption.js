@@ -43,7 +43,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -62,7 +62,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -86,7 +86,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -105,7 +105,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -124,7 +124,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -143,7 +143,7 @@ const Adoption = () => {
               <div class="idea-card">
                 <div class="idea-card__img-container">
                   <img
-                    src="/assets//img/other/dog-idea-1.jpg"
+                    src="/assets/img/other/dog-idea-1.jpg"
                     alt="doggo"
                     class="idea-card__img"
                   />
@@ -205,8 +205,10 @@ const Adoption = () => {
         </section>
         {/* <!-- End pros section--> */}
 
+        <FundraiseOptions />
+
         {/* <!-- Start ready banner --> */}
-        <section class="section--padding ready-section">
+        <section class="section--padding ready-section bg-secondary">
           <div class="container ready-section__container">
             <div class="ready-section__content">
               <h2 class="h2 h-slim text-half-width">
@@ -223,8 +225,6 @@ const Adoption = () => {
           </div>
         </section>
         {/* <!-- End ready banner --> */}
-
-        <FundraiseOptions />
 
         <Shipping />
       </main>

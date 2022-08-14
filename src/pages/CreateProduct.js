@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Breadcrumb from '../components/Breadcrumb';
 import Preloader from '../components/Preloader';
 import belinasiApi from '../apis/belinasiApi';
+import TNew from '../components/TNew';
 
 const CreateProduct = () => {
   const { campaignId } = useParams();
@@ -19,7 +20,8 @@ const CreateProduct = () => {
   const [name, setName] = useState('');
   const [sizes, setSizes] = useState([]);
   const [type, setType] = useState('t-shirt');
-  const [images, setImages] = useState(['']);
+  const [designs, setDesigns] = useState({ front: '', back: '' });
+  // const [images, setImages] = useState(['']);
   const [margin, setMargin] = useState([100]);
 
   const minPrices = {
@@ -27,7 +29,9 @@ const CreateProduct = () => {
     hoodie: 900
   };
 
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const createNotif = (type, message) => {
     searchParams.append(type, message);
@@ -53,13 +57,13 @@ const CreateProduct = () => {
     try {
       e.preventDefault();
 
-      if (
-        !selectedColors.length ||
-        !sizes.length ||
-        !images[0] ||
-        !name ||
-        !message
-      ) {
+      if (!designs.front)
+        return createNotif(
+          'error',
+          'Please design your product and click Save Design button before creating it!'
+        );
+
+      if (!selectedColors.length || !sizes.length || !name || !message) {
         return createNotif('error', 'Please fill all the fields');
       }
 
@@ -74,7 +78,8 @@ const CreateProduct = () => {
         type,
         availableColors: selectedColors,
         price: minPrices[type] + margin,
-        images,
+        // images,
+        designs,
         campaign: campaignId,
         creator: res.data.data.user.id
       };
@@ -184,6 +189,10 @@ const CreateProduct = () => {
         <div className="container">
           <h1 style={{ textAlign: 'center' }}>Create Product</h1>
 
+          <div style={{ paddingTop: '5rem' }}>
+            <TNew setDesigns={setDesigns} />
+          </div>
+
           <form className="create-product-form" onSubmit={createProduct}>
             <div className="create-product-form__section">
               <div>
@@ -239,6 +248,20 @@ const CreateProduct = () => {
               </div>
 
               <div>
+                <label htmlFor="price">Margin:</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={margin}
+                  onChange={e => setMargin(e.target.value)}
+                />
+
+                <label>
+                  Base price for {type} :{minPrices[type]} Rp
+                </label>
+              </div>
+
+              {/* <div>
                 <label>Images (URL): </label>
                 <div
                   style={{
@@ -276,24 +299,10 @@ const CreateProduct = () => {
                     Add More+
                   </a>
                 </div>
-              </div>
+              </div> */}
             </div>
 
-            <div className="create-product-form__section">
-              <div>
-                <label htmlFor="price">Margin:</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={margin}
-                  onChange={e => setMargin(e.target.value)}
-                />
-
-                <label>
-                  Base price for {type} :{minPrices[type]} Rp
-                </label>
-              </div>
-            </div>
+            <div className="create-product-form__section"></div>
 
             <button className="primary__btn" style={{ marginTop: '1rem' }}>
               Create Product
