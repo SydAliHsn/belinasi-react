@@ -189,7 +189,7 @@ const ProductDetails = () => {
                   <div className="product__details--info">
                     <form onSubmit={e => e.preventDefault()}>
                       <h2 className="product__details--info__title mb-15">
-                        {product.title}
+                        {product.name}
                       </h2>
                       <div className="product__details--info__price mb-10">
                         <span className="current__price mb-2">

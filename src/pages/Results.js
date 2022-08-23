@@ -41,7 +41,7 @@ const Shop = () => {
     try {
       setProductsStatus('loading');
 
-      let url = `/products?page=${currPage}&fields=images,name,type,price&q=${q}`;
+      let url = `/products?page=${currPage}&q=${q}`;
       const { data } = await belinasiApi.get(url);
 
       if (currPage === 1) {
